@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="styling.css"/>
+</head>
+<body>
+
+	<!-- The two baeses in the game -->
+	<div class="base1" style="top:80px;left:500px"> </div> 
+	<div class="base2" style="top:800px;left:500px"> </div>
+	
+	<script src="jquery.js"></script>
+	<script src="createObjects.js"></script>
+	<script src="robot.js"></script>
+	<script src="selectingMoving.js"></script>
+	<script>
+	startCivs();
+	$(".civ1").click(selectPlayer);
+	$(".civ2").click(selectPlayer);
+	</script>
+</body>
+
+
+</html>

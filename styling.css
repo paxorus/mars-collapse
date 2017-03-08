@@ -1,0 +1,43 @@
+
+body{
+    background-color: rgb(214, 113, 12);
+}
+
+
+
+.base1, .base2 {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	background: black;
+}
+
+.civ1, .civ2 {
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	position: absolute;
+	/* by default the position is static so its not going to move */
+	/* relative means relative to where it should be */
+	
+}
+
+.civ1{
+	background: blue;
+}
+
+.civ2{
+	background: brown;
+
+}
+
+
+.health {
+	background: green;
+	position: relative;
+	top: -13px;
+	left: -5px;
+}
+
+
+
