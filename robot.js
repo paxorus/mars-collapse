@@ -5,14 +5,15 @@ function Robot(team){
 	this.domElement = div;
 	healthBar.css({width: 50, height: 7});
  	div.append(healthBar);
- 	this.health = healthBar
+ 	this.health = healthBar;
 	if(team == 'civ1'){
 		div.css({top: 200, left: (450 - Math.random() * 300)});
 	}else{
 		div.css({top: 750, left: (550 - Math.random() * 300)});
 	}
 
-	$("body").append(div);
+	$(document.body).append(div);
+	// $("body").append(div);
 	// var counter = 0;
 	this.counter = 0;
 

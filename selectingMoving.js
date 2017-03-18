@@ -5,7 +5,7 @@ var playerSelected = null; //We define a global variable selectedPlayer. Global 
 // var player2Color = "green";
 var colorOf = {
 	"civ1": "blue",
-	"civ2": "green"
+	"civ2": "brown"
 };	
 	
 
@@ -101,12 +101,13 @@ function checkIfAttack(){
 		var entity = Entities.array[i];
 		var player = playerSelected;
 		if(playerSelected[0] != entity && attackRange(player, entity, range)){ //As the player selected is also in the array of entitities we need to make sure that we discard the occasion when we calculate the distance between the same two entities
-			var playObj = Entities.get(player) 
+			var playObj = Entities.get(player)
 			if(entity.team != playObj.team){ //this condition to make sure that a player only attacks someone form the opposite team
-				return attack(playObj,entity); //return as we dont want the computation to continue (i.e we want the object to attack the first player that is an enemy)
+				attack(playObj,entity); //return as we dont want the computation to continue (i.e we want the object to attack the first player that is an enemy)
 			} 
 			
 		}
+
 	}
 
 }
@@ -123,20 +124,25 @@ function attackRange(player,entity,range){
 }
 
 function attack(player,enemy){
+
 	if(attackRange(player.domElement,enemy,100)){
 		//Take Health from the othe player
 		$(enemy.health).css({width: parseInt(enemy.health.get(0).style.width) - 5}) 
+		$(player.health).css({width: parseInt(player.health.get(0).style.width)- 4})
 		//main problem is that doing this doesnt change it in the html page!
 		console.log("killing")
-		
-		//wait(7000)
-		wait(3000)
+
 		if(enemy.health.get(0).style.width == "0px"){
-			return die(enemy)
-
-
+			return die(enemy);
 		}
+		if(player.health.get(0).style.width == "0px"){
+			return die(player);
+		}
+
 		
+		setTimeout(function () {
+			attack(player, enemy);
+		}, 2000);
 		
 		// if(player.health.get(0))
 		// looseHealth()
@@ -146,24 +152,30 @@ function attack(player,enemy){
 		//Hint: Do the shooting as I have learned to done the moving
 		//in a certain direction (with requestanimationframe etc)
 	}
-	requestAnimationFrame(attack(player,enemy))
+	// requestAnimationFrame(attack(player,enemy))
 	
 }
 
-
+//kills the element by deleting the domelement and removing the entity from the arrays of entities
 function die(entity){
-	debugger
 	$(entity.domElement).remove();
+	for(var i= 0; i < Entities.array.length; i++){
+		var arrElement = Entities.array[i];
+		if(arrElement == entity){
+			Entities.array.splice(i,1)
+		}
+	}
+
 }
 
 //this function stops the execution of a thread for 7 seconds
-function wait(ms){
-   var start = new Date().getTime();
-   var end = start;
-   while(end < start + ms) {
-     end = new Date().getTime();
-  }
-}
+// function wait(ms){
+//    var start = new Date().getTime();
+//    var end = start;
+//    while(end < start + ms) {
+//      end = new Date().getTime();
+//   }
+// }
 
 
 
