@@ -1,0 +1,7 @@
+// upon player move or opponent death
+
+checkIfAttack(player):
+	enemiesInRange = find entities with: opposite team, not occupied or occupied with higher health, in range
+	each such enemy attacks player
+	player attacks enemy of lowest health
+	(player travels to closest enemy)

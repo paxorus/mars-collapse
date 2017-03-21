@@ -2,7 +2,7 @@
 //It sets the circles that represent players
 var number = 3;
 function startCivs(){
-		//In order to add an equal number of circles for each team.. we create a "number" of div objects, then add css properties with "{class: 'civ civ1'}" and div.css(..). Finally append the div in some part of the html.
+	//In order to add an equal number of circles for each team.. we create a "number" of div objects, then add css properties with "{class: 'civ civ1'}" and div.css(..). Finally append the div in some part of the html.
 	for(var i = 0; i < number; i++){
 		Entities.push(new Robot('civ1'));
 		Entities.push(new Robot('civ2'));

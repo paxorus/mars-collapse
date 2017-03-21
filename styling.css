@@ -23,12 +23,17 @@ body{
 }
 
 .civ1{
-	background: blue;
+	/*background: blue;*/
+	background-image: url('https://scontent.xx.fbcdn.net/v/t34.0-12/17409998_10212296709959026_215374751_n.jpg?_nc_ad=z-m&oh=a3bb34fd8c4e53e1ea875b7692e04a43&oe=58D16401');
+	background-size: 47px 71px;
+	background-position: -10px -10px;
 }
 
 .civ2{
-	background: brown;
-
+	/*background: brown;*/
+	background-image: url('https://i.ytimg.com/vi/bx7BjjqHf2U/maxresdefault.jpg');
+	background-size: 80px 53px;
+	background-position: -18px -7px;
 }
 
 

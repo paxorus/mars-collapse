@@ -2,10 +2,11 @@ function Robot(team){
 	this.team = team;
 	var div = $("<div>", {class: team });
 	var healthBar = $("<div>",{class: "health"});
-	this.domElement = div;
+	this.view = div;
 	healthBar.css({width: 50, height: 7});
  	div.append(healthBar);
- 	this.health = healthBar;
+
+ 	this.health = 50;
 	if(team == 'civ1'){
 		div.css({top: 200, left: (450 - Math.random() * 300)});
 	}else{
@@ -13,10 +14,13 @@ function Robot(team){
 	}
 
 	$(document.body).append(div);
-	// $("body").append(div);
-	// var counter = 0;
 	this.counter = 0;
-
+	this.fighting = null;
+	
+	this.damage = function (deltaHealth) {
+		this.health += deltaHealth;
+		healthBar.width(this.health);
+	};
 	// this.getLeft = function (){
 	// 	return this.domElement.get(0).style.left;
 	// }();
@@ -35,8 +39,11 @@ function Robot(team){
 	// 	this.domElement.get(0).style.top = num;
 
 	// }
-	
 }
+
+// 
+
+
 
 
 
@@ -50,9 +57,20 @@ var Entities = {
 	get: function (jqueryObject) {
 		var domElement = jqueryObject.get(0);
 		for (var i = 0; i < this.array.length; i ++) {
-			if (domElement == this.array[i].domElement.get(0)) {
+			if (domElement == this.array[i].view.get(0)) {
 				return this.array[i];
 			}
 		}
+	},
+
+	die: function(entity){
+		entity.view.remove();
+		for(var i= 0; i < this.array.length; i++){
+			var arrElement = this.array[i];
+			if(arrElement == entity){
+				this.array.splice(i,1)
+			}
+		}
+
 	}
 };
