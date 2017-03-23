@@ -1,11 +1,11 @@
 function Mine(num) {
-	// this.id = id;
 	this.amount = num;
-	var m = $("<img>", {class: "mine", src: "metal_icon.png"});
+	var m = $("<img>", {class: "mine", src: "images/metal_icon.png"});
 	m.css({
 		top: Util.pick(70, window.innerHeight - 95),
 		left: Util.pick(70, window.innerWidth - 95)
 	});
+	this.view = m;
 	$(document.body).append(m);
 
 	//add up

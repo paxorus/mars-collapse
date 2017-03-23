@@ -1,4 +1,6 @@
 /**
+ * Selecting, moving, and attacking functionality.
+ *
  * @author Tristan, Cuimei, Prakhar
  */
 
@@ -17,7 +19,6 @@ function selectPlayer(event){
 	playerSelected.css("opacity", 0.75);
 
 	event.stopPropagation();// Click should not propagate to document
-
 }
 
 
@@ -71,40 +72,38 @@ function goUp(player,travelDistanceY){
 }
 
 
-
-// method to calculate if there is any enemies within a certain radius.
+// update which robots are engaged in combat
 function checkIfAttack(player){
-	var enemiesInRange = Entities.array.filter(function (entity) {
-		return entity instanceof Robot
-			&& entity.team != player.team // opposite team
-			&& (entity.fighting === null || entity.fighting.health > player.health ) // not attacking its lowest health enemy
+
+	// identify potential targets: bases, robots, etc.
+	var potentialTargets = Entities.array.filter(function (entity) {
+		return Entities.isEnemy(entity, player) // opposite team
 			&& attackRange(player.view.position(), entity.view.position(), 100);// within range
 	});
-	
-	if(enemiesInRange.length == 0){
-		return;
-	}
-	
+
 	// player attacks enemy of lowest health 
-	var weakestEnemy = enemiesInRange.reduce(function(x,y){
-		return x.health < y.health ? x : y;
+	if(potentialTargets.length > 0){
+		var weakestEnemy = potentialTargets.reduce(function(x,y){
+			return x.health < y.health ? x : y;
+		});
+
+		player.attack(weakestEnemy);
+	}
+
+	var enemiesInRange = potentialTargets.filter(function (entity) {
+		return entity instanceof Robot // is a robot
+			&& (entity.fighting === null || entity.fighting.health > player.health ); // not attacking its lowest health enemy
 	});
-		
-	player.fighting = weakestEnemy;
-	attack(player);
 
-	// have each enemy attack this player
+	// have each such enemy attack this player
 	enemiesInRange.forEach(function (enemy) {
-		if(enemy.fighting == null){
-			enemy.fighting = player;
-			attack(enemy);
-		}
-		enemy.fighting = player;
-
+		enemy.attack(player);
 	});
 
 }
 
+
+// method to calculate if there is any enemies within a certain radius.
 // player and entity are jQuery Position objects
 function attackRange(player,entity,range){
 	return Util.distance(entity.left - player.left, entity.top - player.top) < range;
@@ -112,6 +111,7 @@ function attackRange(player,entity,range){
 
 function attack(player){
 	var enemy = player.fighting;
+	// console.log(player, "attacks", enemy);
 
 	if (enemy === null) {	
 		return;// player is in motion
@@ -127,6 +127,9 @@ function attack(player){
 	enemy.damage(-5);
 
 	if(enemy.health <= 0){
+		if (playerSelected.is(enemy.view)) {
+			playerSelected = null;
+		}
 		Entities.die(enemy);
 		// look around for someone else to kill!
 		player.fighting = null;

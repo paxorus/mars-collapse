@@ -21,6 +21,10 @@ var Entities = {
 			}
 		}
 
+	},
+
+	isEnemy: function (x, y) {
+		return "team" in x && "team" in y && x.team != y.team;
 	}
 };
 

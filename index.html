@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mars Collapse</title>
+	<link rel="stylesheet" type="text/css" href="stylesheets/styling.css"/>
+</head>
+<body>
+	<div id = "hud-display">
+		<img class= "icon" id = "metal" src = "images/metal_icon.png">
+		<span id = "metal-amount"></span>
+		<br>
+		<img class= "icon" id = "robot" src = "images/robot_icon.png">
+		<span id = "robot-amount"></span>
+	</div>
+	<!-- The two bases in the game -->
+	<div class="base1" style="top:80px;left:500px"> </div> 
+	<div class="base2" style="top:800px;left:500px"> </div>
+	
+
+	<script src = "javascripts/jquery.js"></script>
+	<script src = "javascripts/Util.js"></script>
+
+	<script src = "javascripts/Entities.js"></script>
+	<script src = "javascripts/createObjects.js"></script>
+	<script src = "javascripts/robot.js"></script>
+	<script src = "javascripts/dynamics.js"></script>
+	<script src = "javascripts/Mine.js"></script>
+	<script>
+	startCivs();
+	$(".civ1").click(selectPlayer);
+	$(".civ2").click(selectPlayer);
+	</script>
+</body>
+
+
+</html>
