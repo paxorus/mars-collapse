@@ -1,43 +1,27 @@
-var Entities = {
-	array: [],
-	push: function (x) {
-		this.array.push(x);
-	},
-	get: function (jqueryObject) {
+function EntitiesTemplate() {
+	this.get = function (jqueryObject) {
 		var domElement = jqueryObject.get(0);
-		for (var i = 0; i < this.array.length; i ++) {
-			if (domElement == this.array[i].view.get(0)) {
-				return this.array[i];
+		for (var i = 0; i < this.length; i ++) {
+			if (domElement == this[i].view.get(0)) {
+				return this[i];
 			}
 		}
 	},
 
-	die: function(entity){
-		entity.view.remove();
-		for(var i= 0; i < this.array.length; i++){
-			var arrElement = this.array[i];
+	this.remove = function(entity){
+		for(var i= 0; i < this.length; i++){
+			var arrElement = this[i];
 			if(arrElement == entity){
-				this.array.splice(i,1)
+				this.splice(i,1)
 			}
 		}
 
 	},
 
-	isEnemy: function (x, y) {
+	this.isEnemy = function (x, y) {
 		return "team" in x && "team" in y && x.team != y.team;
 	}
 };
 
-// function Entities(){
-
-// 	this.get = function (jqueryObject) {
-// 		var domElement = jqueryObject.get(0);
-// 		for (var i = 0; i < this.length; i ++) {
-// 			if (domElement == this[i].domElement.get(0)) {
-// 				return this[i];
-// 			}
-// 		}
-// 	};
-// }
-
-// Entities.prototype = [];
+EntitiesTemplate.prototype = [];
+var Entities = new EntitiesTemplate();

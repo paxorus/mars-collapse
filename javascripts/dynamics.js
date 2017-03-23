@@ -6,6 +6,13 @@
 
 var playerSelected = null;// the last clicked player, as a jQuery object
 
+$(document).contextmenu(function (event) {// right-click to deselect
+	if(playerSelected){
+		playerSelected.css("opacity", 1);
+		playerSelected = null;
+	}
+	event.preventDefault();
+});
 
 function selectPlayer(event){
 	if(event.target.className != 'civ1' && event.target.className != 'civ2'){
@@ -15,32 +22,31 @@ function selectPlayer(event){
 	if(playerSelected){
 		playerSelected.css("opacity", 1);
 	}
-	playerSelected = $(event.target);// enhances the event.target (not a regular html object)
+	playerSelected = $(event.target);// convert to jQuery object
 	playerSelected.css("opacity", 0.75);
 
-	event.stopPropagation();// Click should not propagate to document
+	event.stopPropagation();// click should not propagate to document
 }
 
 
-//This method is used to move the player 
-//we use a counter variable for the movePlayer method, in order so that when a
-//user clicks at a point on the screen while the player is moving, the movePlayer function for the first move stops
-//(as counter will not be equal to id anymore, thus returning) and the second moving process starts
+/**
+ * Move the player to the designated location on the map.
+ */
 $(document).click(function (event){
 	if (!playerSelected) {
 		return;
 	}
-	var entity = Entities.get($(playerSelected));
-	entity.fighting = null;
-	var view = entity.view;
-	entity.counter ++;// invalidate all previous animation loops
-	var id = entity.counter;
+	var robot = Entities.get($(playerSelected));
+	robot.fighting = null;
+	var view = robot.view;
+	robot.counter ++;// invalidate all previous movePlayer() animation loops
+	var id = robot.counter;
 	var speed = 3;
 	var targetX = event.clientX - 20 + document.body.scrollLeft;
 	var targetY = event.clientY - 20 + document.body.scrollTop;
 
 	function movePlayer() {
-		if (entity.counter != id) {// validate this animation loop with the current counter value
+		if (robot.counter != id) {// validate this movePlayer() animation loop with the current counter value
 			return;
 		}
 		var position = view.position();
@@ -49,34 +55,30 @@ $(document).click(function (event){
 		var distance = Util.distance(distanceX, distanceY);
 		if(distance < speed){
 			// final iteration
-			view.css({left: targetX, top: targetY });
-			checkIfAttack(entity);
+			robot.goTo(targetX, targetY);
+			checkIfAttack(robot);
 		}else{
-			goLeft(view,distanceX * (speed/distance));
-			goUp(view,distanceY * (speed/distance));
+			robot.goLeft(distanceX * (speed/distance));
+			robot.goUp(distanceY * (speed/distance));
 			requestAnimationFrame(movePlayer);
-		}
-			
+		}		
 	}
 	movePlayer();
 });
 
 
-function goLeft(player,travelDistanceX){
-	player.css('left', player.position().left +  travelDistanceX );
-}
 
 
-function goUp(player,travelDistanceY){
-	player.css('top', player.position().top + travelDistanceY );
-}
 
-
-// update which robots are engaged in combat
+/**
+ * Update which robots are engaged in combat.
+ * Robots will favor attacking the enemy object with the lowest health. Robots will automatically
+ * detect a nearby enemy when it enters their radius.
+ */
 function checkIfAttack(player){
 
 	// identify potential targets: bases, robots, etc.
-	var potentialTargets = Entities.array.filter(function (entity) {
+	var potentialTargets = Entities.filter(function (entity) {
 		return Entities.isEnemy(entity, player) // opposite team
 			&& attackRange(player.view.position(), entity.view.position(), 100);// within range
 	});
@@ -91,9 +93,10 @@ function checkIfAttack(player){
 	}
 
 	var enemiesInRange = potentialTargets.filter(function (entity) {
-		return entity instanceof Robot // is a robot
+		return entity.type == "Robot" // is a robot
 			&& (entity.fighting === null || entity.fighting.health > player.health ); // not attacking its lowest health enemy
 	});
+	// console.log(enemiesInRange);
 
 	// have each such enemy attack this player
 	enemiesInRange.forEach(function (enemy) {
@@ -103,15 +106,19 @@ function checkIfAttack(player){
 }
 
 
-// method to calculate if there is any enemies within a certain radius.
-// player and entity are jQuery Position objects
+/**
+ * Calculate whether two objects are close enough.
+ * @param player - jQuery Position object
+ * @param entity - jQuery Position object
+ * @param range - an integer
+ * @returns whether the player and entity are in range
+ */
 function attackRange(player,entity,range){
 	return Util.distance(entity.left - player.left, entity.top - player.top) < range;
 }
 
 function attack(player){
 	var enemy = player.fighting;
-	// console.log(player, "attacks", enemy);
 
 	if (enemy === null) {	
 		return;// player is in motion
@@ -124,13 +131,13 @@ function attack(player){
 		return;
 	}
 
-	enemy.damage(-5);
+	enemy.applyHealth(-5);
 
 	if(enemy.health <= 0){
 		if (playerSelected.is(enemy.view)) {
 			playerSelected = null;
 		}
-		Entities.die(enemy);
+		enemy.die();
 		// look around for someone else to kill!
 		player.fighting = null;
 		checkIfAttack(player);
@@ -139,4 +146,20 @@ function attack(player){
 	setTimeout(function () {
 		attack(player);
 	}, 1000);
+}
+
+
+function attackBase(event) {
+	if (playerSelected === null) {
+		return;
+	}
+	var base = Entities.get($(event.target));
+	var attacker = Entities.get(playerSelected);
+
+	if (!Entities.isEnemy(attacker, base)) {
+		return;
+	}
+
+	attacker.fighting = base;
+	attack(attacker);
 }

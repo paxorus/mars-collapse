@@ -1,26 +1,20 @@
 function Robot(team){
+	this.type = "Robot";
 	this.team = team;
 	var div = $("<div>", {class: team });
-	var healthBar = $("<div>",{class: "health"});
 	this.view = div;
-	healthBar.css({width: 50, height: 7});
- 	div.append(healthBar);
 
- 	this.health = 50;
-	if(team == 'civ1'){
-		div.css({top: 200, left: Util.pick(150, 450)});
+	if(team == "civ1"){
+		div.css({top: 200, left: Util.pick(100, 500)});
 	}else{
-		div.css({top: 750, left: Util.pick(250, 550)});
+		div.css({top: 500, left: Util.pick(100, 500)});
 	}
 
 	$(document.body).append(div);
+ 	this.addHealthBar(div, 50);
+
 	this.counter = 0;
 	this.fighting = null;
-	
-	this.damage = function (deltaHealth) {
-		this.health += deltaHealth;
-		healthBar.width(this.health);
-	};
 
 	this.attack = function (entity) {
 		if(this.fighting === null){
@@ -37,4 +31,67 @@ function Robot(team){
 			this.fighting = entity;
 		}
 	};
+
+	this.goLeft = function (travelDistanceX){
+		this.view.css('left', this.view.position().left +  travelDistanceX );
+	};
+
+	this.goUp = function (travelDistanceY){
+		this.view.css('top', this.view.position().top + travelDistanceY );
+	};
+
+	this.goTo = function (targetX, targetY) {
+		this.view.css({left: targetX, top: targetY });
+	}
+
+	// event listeners
+	div.click(selectPlayer);
 }
+
+function CivBase(team) {
+	this.type = "CivBase";
+	this.team = team;
+
+	var div = $("<div>", {class: "base"});
+	this.view = div;
+
+	if (team == "civ1") {
+		div.addClass("civ1-base");
+	} else {
+		div.addClass("civ2-base");
+	}
+
+	$(document.body).append(div);
+	this.addHealthBar(div, 200);
+
+	div.click(attackBase);
+}
+
+var EntityPrototype = {
+	addHealthBar: function (view, health) {
+		this.initialHealth = health;
+		this.health = health;
+		this.healthBar = $("<div>", {class: "health-bar"});
+		this.healthBar.css({marginLeft: (view.width() - health) / 2 + "px", width: health});
+		view.append(this.healthBar);
+	},
+
+	applyHealth: function (deltaHealth) {
+		this.health += deltaHealth;
+		this.healthBar.width(this.health);
+		var color = Util.rybCurve(this.health / this.initialHealth);
+		this.healthBar.css("background-color", color);
+	},
+
+	is: function (type) {
+		return type == this.constructor.name;
+	},
+
+	die: function () {
+		this.view.remove();
+		Entities.remove(this);
+	}
+}
+
+Robot.prototype = EntityPrototype;
+CivBase.prototype = EntityPrototype;

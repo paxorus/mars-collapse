@@ -1,21 +1,44 @@
+* {
+	user-select: none;
+}
 
 body{
 	margin: 0;
     background-color: rgb(214, 113, 12);
+    height: 740px;
+    background-image: url('https://s-media-cache-ak0.pinimg.com/originals/bd/7e/57/bd7e575a80a12958ed625157327ffbfa.jpg');
+    background-size: cover;
 }
 
-.base1, .base2 {
+.base {
 	position: absolute;
-	width: 100px;
+	left: 50%;
+	margin-left: -75px;
+	width: 150px;
 	height: 100px;
 	background: black;
+	cursor: pointer;
+}
+
+.civ1-base {
+	top: 80px;
+	background-image: url("../images/base1.jpg");
+	background-size: cover;
+}
+
+.civ2-base {
+	top: 570px;
+	background-image: url('../images/base2.jpg');
+	background-size: 160px 100px;
+	background-position-x: -10px;
 }
 
 .civ1, .civ2 {
 	width: 40px;
 	height: 40px;
 	border-radius: 20px;
-	position: absolute;	
+	position: absolute;
+	cursor: pointer;
 }
 
 .civ1{
@@ -31,11 +54,11 @@ body{
 }
 
 
-.health {
-	background: green;
+.health-bar {
+	background-color: #0088FF;
 	position: relative;
+	height: 7px;
 	top: -13px;
-	left: -5px;
 }
 
 #hud-display {
@@ -51,13 +74,14 @@ body{
 	position: relative;
 	left: 5px;
 	top: 5px;
-	width:25px;
-	height:25px;
+	width: 25px;
+	height: 25px;
 }
 .mine {
-	width:25px;
-	height:25px;
+	width: 30px;
+	height: 30px;
 	position: absolute;
+	cursor: pointer;
 }
 
 
