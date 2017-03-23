@@ -1,9 +1,8 @@
 
 body{
+	margin: 0;
     background-color: rgb(214, 113, 12);
 }
-
-
 
 .base1, .base2 {
 	position: absolute;
@@ -16,21 +15,16 @@ body{
 	width: 40px;
 	height: 40px;
 	border-radius: 20px;
-	position: absolute;
-	/* by default the position is static so its not going to move */
-	/* relative means relative to where it should be */
-	
+	position: absolute;	
 }
 
 .civ1{
-	/*background: blue;*/
 	background-image: url('https://scontent.xx.fbcdn.net/v/t34.0-12/17409998_10212296709959026_215374751_n.jpg?_nc_ad=z-m&oh=a3bb34fd8c4e53e1ea875b7692e04a43&oe=58D16401');
 	background-size: 47px 71px;
 	background-position: -10px -10px;
 }
 
 .civ2{
-	/*background: brown;*/
 	background-image: url('https://i.ytimg.com/vi/bx7BjjqHf2U/maxresdefault.jpg');
 	background-size: 80px 53px;
 	background-position: -18px -7px;
@@ -44,14 +38,12 @@ body{
 	left: -5px;
 }
 
-.hudisplay {
+#hud-display {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 30%;
 	height: 65px;
-	/*background-color: white;
-	opacity: 0.5;*/
 	background-color: rgba(255, 255, 255, 0.5);
 }
 .icon {
@@ -60,7 +52,6 @@ body{
 	top: 5px;
 	width:25px;
 	height:25px;
-	/*background-color: rgba(255, 255, 255, 1);*/
 }
 .mine {
 	width:25px;
