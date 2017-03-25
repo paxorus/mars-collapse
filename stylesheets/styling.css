@@ -10,6 +10,17 @@ body{
     background-size: cover;
 }
 
+
+.factory {
+	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	background-size: 400px 210px;
+	background-position: -100px -50px;
+	cursor: pointer;
+}
+
 .base {
 	position: absolute;
 	left: 50%;
@@ -43,8 +54,8 @@ body{
 
 .civ1{
 	background-image: url('../images/eskie.jpg');
-	background-size: 47px 71px;
-	background-position: -10px -10px;
+	background-size: 40px 60px;
+	background-position: 0 -10px;
 }
 
 .civ2{

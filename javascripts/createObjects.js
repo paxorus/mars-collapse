@@ -27,7 +27,9 @@ function startCivs(){
 		Entities.push(new Robot('civ2'));
 	}
 
+	// Entities.push(new Factory('civ1', {top: 100, left: 100}));
 
+	// Entities.push(new Factory('civ1', {top: 100, left: 100}));
 
 	updateHud();
 }

@@ -8,8 +8,11 @@ var Util = {
 		return Math.floor(a + Math.random() * (b - a));
 	},
 	rybCurve: function (x) {
+		if (x === 1) {
+			return "#0088FF";// 100% health -> neon blue
+		}
 		// continuous map from x in [0,1] to an RGB triplet, red to yellow to green
-		var red = Math.min(1 - x / 2, 1);
+		var red = Math.min(2 - 2 * x, 1);
 		var green = Math.min(2 * x, 1);
 		var blue = 0;
 
