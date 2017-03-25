@@ -4,26 +4,28 @@
  * @author Tristan, Cuimei, Prakhar
  */
 
-var selectedObject = null;// the last clicked player, as a jQuery object
+var selectedObject = null;// the last clicked object
 
+// 
 $(document).contextmenu(function (event) {// right-click to deselect
 	if(selectedObject){
-		selectedObject.css("opacity", 1);
+		selectedObject.view.css("opacity", 1);
 		selectedObject = null;
 	}
 	event.preventDefault();
 });
 
 function selectPlayer(event){
-	if(event.target.className != 'civ1' && event.target.className != 'civ2'){
+	var entity = Entities.get($(event.target));
+	if (!Entities.is(entity, "Robot")) {
 		return;
 	}
 
 	if(selectedObject){
-		selectedObject.css("opacity", 1);
+		selectedObject.view.css("opacity", 1);
 	}
-	selectedObject = $(event.target);// convert to jQuery object
-	selectedObject.css("opacity", 0.75);
+	entity.view.css("opacity", 0.75);
+	selectedObject = entity;
 
 	event.stopPropagation();// click should not propagate to document
 }
@@ -39,13 +41,13 @@ function goAndAttack(event) {
 	if (!selectedObject) {
 		return;
 	}
-	var robot = Entities.get(selectedObject);
-	if (!Entities.is(robot, "Robot")) {
+	if (!Entities.is(selectedObject, "Robot")) {
 		return;
 	}
-	var targetX = event.clientX - 20 + document.body.scrollLeft;
-	var targetY = event.clientY - 20 + document.body.scrollTop;
-	robot.moveTo(targetX, targetY, function () {
+	var target = Util.project(event.clientX, event.clientY);
+	var robot = selectedObject;
+
+	robot.moveTo(target, function () {
 		checkIfAttack(robot);
 	});
 };
@@ -65,18 +67,19 @@ function checkIfAttack(player){
 			&& Entities.distance(player, entity) <= 100;// within range
 	});
 
+
 	// player attacks enemy of lowest health 
 	if(potentialTargets.length > 0){
-		var weakestEnemy = potentialTargets.reduce(function(x,y){
-			return x.health < y.health ? x : y;
+		var weakestEnemy = potentialTargets.reduce(function(x, y) {
+			return (x.health < y.health) ? x : y;
 		});
 
 		player.attack(weakestEnemy);
 	}
 
 	var enemiesInRange = potentialTargets.filter(function (entity) {
-		return entity.type == "Robot" // is a robot
-			&& (entity.fighting === null || entity.fighting.health > player.health ); // not attacking its lowest health enemy
+		return Entities.is(entity, "Robot") // is a robot
+			&& (entity.getTarget() === null || entity.getTarget().health > player.health ); // not attacking its lowest health enemy
 	});
 
 	// have each such enemy attack this player
@@ -86,40 +89,6 @@ function checkIfAttack(player){
 
 }
 
-
-
-
-function attack(player){
-	var enemy = player.fighting;
-
-	if (enemy === null) {	
-		return;// player is in motion
-	}
-
-	if(Entities.distance(player, enemy) > 100){
-		// enemy has gone out of range and player not moving
-		player.fighting = null;
-		checkIfAttack(player);
-		return;
-	}
-
-	enemy.applyHealth(-5);
-
-	if(enemy.health <= 0){
-		if (enemy.view.is(selectedObject)) {
-			selectedObject = null;
-		}
-		enemy.die();
-		// look around for someone else to kill!
-		player.fighting = null;
-		checkIfAttack(player);
-		return;
-	}
-
-	setTimeout(function () {
-		attack(player);
-	}, 1000);
-}
 
 /**
  * Do building stuff.
@@ -139,10 +108,11 @@ function activateBuildingMode() {
 	$(document).off("click");
 
 	$(document).mousemove(function (event) {
+		var position = {left: event.clientX, top: event.clientY};
 		if (building === null) {
-			building = new Factory('civ1', {left: event.clientX, top: event.clientY});
+			building = new Factory('civ1', position);
 		} else {
-			building.view.css({left: event.clientX, top: event.clientY});
+			building.view.css(position);
 		}
 	});
 
@@ -155,60 +125,30 @@ function activateBuildingMode() {
 		Entities.push(building);
 
 		// selected player will move to it
-		var robot = Entities.get(selectedObject);
-		var targetX = event.clientX - 20 + document.body.scrollLeft;
-		var targetY = event.clientY - 20 + document.body.scrollTop;
-		robot.moveTo(targetX, targetY, function () {
-			setTimeout(function () {
-				robot.build(building);
-			}, 1000);
+		if (!Entities.is(selectedObject, "Robot")) {
+			return;
+		}
+		var robot = selectedObject;
+		var target = Util.project(event.clientX, event.clientY);
+		robot.moveTo(target, function () {			
+			robot.build(building);
 		});
 	});
 }
 
-function build(robot) {
-	var building = robot.constructing;
 
-	if (building === null) {
-		return;// player is in motion
-	}
-
-	if (Entities.distance(robot, building) > 100) {
-		robot.constructing = null;
-		checkIfAttack(robot);// or maybe look for other things to build?
-		return;
-	}
-
-	building.build(5);
-
-	if (building.isFinished()) {
-		building.finish();
-
-		robot.constructing = null;
-		checkIfAttack(robot);
-		return;
-	}
-
-	setTimeout(function () {
-		build(robot);
-	}, 1000);
-}
 
 function recruitBuilder(event) {
-	var robot = Entities.get(selectedObject);
-	if (!Entities.is(robot, "Robot")) {
+	if (!Entities.is(selectedObject, "Robot")) {
 		return;
 	}
 
-	var targetX = event.clientX - 20 + document.body.scrollLeft;
-	var targetY = event.clientY - 20 + document.body.scrollTop;
-	
-	var factory = Entities.get($(event.target));
+	var target = Util.project(event.clientX, event.clientY);	
+	var robot = selectedObject;
+	var building = Entities.get($(event.target));
 
-	robot.moveTo(targetX, targetY, function () {
-		setTimeout(function () {
-			build(robot, factory);
-		}, 1000);
+	robot.moveTo(target, function () {
+		robot.build(building);
 	});
 	event.stopPropagation();// click should not propagate to document
 }

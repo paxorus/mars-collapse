@@ -20,5 +20,10 @@ var Util = {
 	},
 	pix: function (x) {
 		return Math.floor(255 * x);
+	},
+	project: function (x, y) {
+		x += document.body.scrollLeft - 20;
+		y += document.body.scrollTop - 20;
+		return {x: x, y: y};
 	}
 };

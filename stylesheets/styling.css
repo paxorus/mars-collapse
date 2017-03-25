@@ -23,8 +23,7 @@ body{
 
 .base {
 	position: absolute;
-	left: 50%;
-	margin-left: -75px;
+	left: 400px;
 	width: 150px;
 	height: 100px;
 	background: black;
@@ -50,18 +49,21 @@ body{
 	border-radius: 20px;
 	position: absolute;
 	cursor: pointer;
+	z-index: 3;/* below HUD, above buildings */
 }
 
 .civ1{
 	background-image: url('../images/eskie.jpg');
 	background-size: 40px 60px;
 	background-position: 0 -10px;
+	top: 200px;
 }
 
 .civ2{
 	background-image: url('../images/beagle.jpg');
 	background-size: 80px 53px;
 	background-position: -18px -7px;
+	top: 500px;
 }
 
 
