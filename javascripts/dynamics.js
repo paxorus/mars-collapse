@@ -1,13 +1,15 @@
 /**
- * Selecting, moving, and attacking functionality.
+ * Event handlers for
  *
  * @author Tristan, Cuimei, Prakhar
  */
 
 var selectedObject = null;// the last clicked object
 
-// 
-$(document).contextmenu(function (event) {// right-click to deselect
+/**
+ * On right-click, deselect the object.
+ */
+$(document).contextmenu(function (event) {
 	if(selectedObject){
 		selectedObject.view.css("opacity", 1);
 		selectedObject = null;
@@ -15,87 +17,77 @@ $(document).contextmenu(function (event) {// right-click to deselect
 	event.preventDefault();
 });
 
-function selectPlayer(event){
+/**
+ * Clicking a Robot selects it. Clicking a civ2 directs the selected Robot to attack it.
+ */
+function selectObject(event){
 	var entity = Entities.get($(event.target));
-	if (!(entity instanceof Robot)) {
-		return;
+	if (entity === null) {
+		console.log(event.target);
 	}
-
-	if(selectedObject){
+	if (selectedObject) {
 		selectedObject.view.css("opacity", 1);
 	}
 	entity.view.css("opacity", 0.75);
-	selectedObject = entity;
 
+	if (Entities.myRobot(selectedObject) && Entities.isEnemy(selectedObject, entity)) {
+		declareWar(selectedObject, entity);
+	}
+
+	selectedObject = entity;
 	event.stopPropagation();// click should not propagate to document
 }
 
 
 /**
- * Move the player to the designated location on the map.
+ * If the selected object is an enemy, engage all Robots that are in attack or null mode.
  */
-$(document).click(goAndAttack);
+function declareWar(robot, enemyObject) {
 
-function attackObject(event) {
-	if (!Entities.is(selectedObject, "Robot")) {
-		return;
-	}
-	var enemyObject = Entities.get($(event.target));
-	var robot = selectedObject;
-
-	robot.go(enemyObject.view.position(), function () {
+	robot.go(enemyObject, function () {
 		robot.attack(enemyObject);
 	});
+
+	// start conflict
+	var attackerRobots = Entities.filter(function (entity) {
+		return entity instanceof Robot // is a robot
+			&& (entity.getAction() === null || entity.getAction() == "attack");
+	});
+
+	attackerRobots.forEach(function (attacker) {
+		if (attacker.team == "civ1") {
+
+			attacker.go(enemyObject, function () {
+				attacker.attack(enemyObject);
+			});		
+		} else {
+			attacker.go(robot, function () {
+				attacker.attack(robot);
+			});
+		}
+	});
+
 	event.stopPropagation();
 }
 
 
-function goAndAttack(event) {
-	if (!Entities.is(selectedObject, "Robot")) {
-		return;
-	}
-	var target = Util.project(event.clientX, event.clientY);
-	var robot = selectedObject;
-
-	robot.go(target);
-};
-
 
 
 /**
- * Update which robots are engaged in combat.
- * Robots will favor attacking the enemy object with the lowest health. Robots will automatically
- * detect a nearby enemy when it enters their radius.
+ * Move the player to the designated location on the map.
  */
-function checkIfAttack(player){
-
-	// identify potential targets: bases, robots, etc.
-	var potentialTargets = Entities.filter(function (entity) {
-		return Entities.isEnemy(entity, player) // opposite team
-			&& Entities.distance(player, entity) <= 100;// within range
-	});
-
-
-	// player attacks enemy of lowest health 
-	if(potentialTargets.length > 0){
-		var weakestEnemy = potentialTargets.reduce(function(x, y) {
-			return (x.health < y.health) ? x : y;
-		});
-
-		player.attack(weakestEnemy);
+function goTo(event) {
+	if (!Entities.myRobot(selectedObject)) {
+		return;
 	}
+	var target = Util.project(event.clientX, event.clientY);
+	selectedObject.go(target);
+};
+/**
+ * Clicking the document directs the selected Robot to the point.
+ */
+$(document).click(goTo);
 
-	var enemiesInRange = potentialTargets.filter(function (entity) {
-		return entity instanceof Robot // is a robot
-			&& (entity.getTarget() === null || entity.getTarget().health > player.health ); // not attacking its lowest health enemy
-	});
-
-	// have each such enemy attack this player
-	enemiesInRange.forEach(function (enemy) {
-		enemy.attack(player);
-	});
-
-}
 
 
 /**
@@ -131,13 +123,13 @@ function activateBuildingMode() {
 	$(document).click(function () {
 		// revert mouse behavior
 		$(document).off("click");
-		$(document).on("click", goAndAttack);
+		$(document).on("click", goTo);
 		$(document).off("mousemove");
 		Entities.push(building);
 		building.start();
 
 		// selected player will move to it
-		if (!Entities.is(selectedObject, "Robot")) {
+		if (!Entities.myRobot(selectedObject)) {
 			return;
 		}
 		var robot = selectedObject;
@@ -148,10 +140,11 @@ function activateBuildingMode() {
 	});
 }
 
-
-
+/**
+ * Clicking a building directs the selected Robot to help build it.
+ */
 function recruitBuilder(event) {
-	if (!Entities.is(selectedObject, "Robot")) {
+	if (!Entities.myRobot(selectedObject)) {
 		return;
 	}
 

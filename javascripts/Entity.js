@@ -1,4 +1,4 @@
-/*
+/**
  * An Entity can take damage, die, and will update its health bar.
  */
 class Entity {
@@ -6,9 +6,7 @@ class Entity {
 	constructor(team) {
 		this.team = team;
 		this.view = $("<div>");
-		if (team != "civ1") {
-			this.view.click(attackObject);
-		}
+		this.view.click(selectObject);
 		$(document.body).append(this.view);
 	}
 
@@ -32,23 +30,31 @@ class Entity {
 	die() {
 		this.view.remove();
 		Entities.remove(this);
+		if (this == selectedObject) {
+			selectedObject = null;
+		}
 	}
 }
 
+/**
+ * Buildings will start at 0% health and finish at 100% health.
+ * By default, they have 100 health points.
+ */
 class Building extends Entity {
 
 	constructor(team, position, initialHealth) {
 		super(team);
 		this.initialHealth = initialHealth || 100;
-		// console.log(this.view);
 		this.view.css(position);
 		this.view.css("filter", "brightness(50%)");
+		this.view.off("click");
 	}
 
 	start() {
 		this.addHealthBar(this.initialHealth);
 		this.applyHealth(- this.initialHealth);// set health to 0
 		this.view.click(recruitBuilder);
+		this.view.click(selectObject);
 	}
 
 	build(deltaProgress) {
@@ -58,6 +64,7 @@ class Building extends Entity {
 
 	finish() {
 		this.view.css("filter", "none");
+		this.view.off("click", recruitBuilder);
 	}
 
 	isFinished() {
@@ -68,10 +75,8 @@ class Building extends Entity {
 
 
 /**
- * CivBase < Entity
- * 
+ * CivBase models the team base.
  */
-
 class CivBase extends Entity {
 	constructor(team) {
 		super(team);
@@ -89,6 +94,9 @@ class CivBase extends Entity {
 	}
 }
 
+/**
+ * A Factory is a Building with 50 health and CSS class .factory.
+ */
 class Factory extends Building {
 
 	constructor(team, position) {
