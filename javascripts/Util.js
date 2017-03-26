@@ -24,6 +24,6 @@ var Util = {
 	project: function (x, y) {
 		x += document.body.scrollLeft - 20;
 		y += document.body.scrollTop - 20;
-		return {x: x, y: y};
+		return {left: x, top: y};
 	}
 };

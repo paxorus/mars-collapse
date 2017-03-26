@@ -3,140 +3,174 @@
  * 
  */
 
-function Robot(team){
-	this.type = "Robot";
-	this.team = team;
-	var div = $("<div>", {class: team });
-	this.view = div;
-	div.css("left", Util.pick(250, 600));
+class Robot extends Entity {
+	constructor(team) {
+		super(team);
+		this.type = "Robot";
+		this._callback = null;
+		this._target = null;
+		this._action = null;
+		this._speed = 3;
 
-	$(document.body).append(div);
- 	this.addHealthBar(div, 50);
-
-	var robot = this;
-	var view = this.view;
-	var callback = null;
-	var target = null;
-	var action = null;
-	var speed = 3;
-
-	this.attack = function (entity) {
-		target = entity;
-		if (action != "attack") {
-			action = "attack";
-			setTimeout(attack, 1000);
+		this.view.addClass("robot");
+		if (team == "civ1") {
+			this.view.addClass("civ1-robot");
+		} else {
+			this.view.addClass("civ2-robot");
 		}
-	};
+		this.view.css("left", Util.pick(250, 600));
+	 	this.addHealthBar(50);
 
-	this.build = function (entity) {
-		target = entity;
-		if (action != "build") {
-			action = "build";
-			setTimeout(build, 1000);
+ 		// event listeners
+		// if (team == "civ1") {
+			this.view.click(selectPlayer);
+		// }
+ 	}
+
+	attack(entity) {
+		this._target = entity;
+		if (this._action != "attack") {
+			this._action = "attack";
+			setTimeout(this._attack.bind(this), 1000);
+		}
+	}
+
+	build(entity) {
+		this._target = entity;
+		if (this._action != "build") {
+			this._action = "build";
+			setTimeout(this._build.bind(this), 1000);
 		}
 		entity.view.click(recruitBuilder);
-	};
+	}
 
-	this.moveTo = function (newTarget, newCallback){
-		target = newTarget;
-		callback = newCallback;
-		if (action != "move") {
-			action = "move";
-			movePlayer();
+	go(newTarget, newCallback) {
+		this._target = newTarget;
+		this._callback = newCallback || null;
+		if (this._action != "go") {
+			this._action = "go";
+			this._go();
 		}
-	};
+	}
 
-	this.goLeft = function (travelDistanceX){
-		this.view.css('left', this.view.position().left +  travelDistanceX );
-	};
+	shift(deltaX, deltaY) {
+		this.view.css({
+			left: this.view.position().left +  deltaX,
+			top: this.view.position().top + deltaY
+		});
+	}
 
-	this.goUp = function (travelDistanceY){
-		this.view.css('top', this.view.position().top + travelDistanceY );
-	};
-
-	this.goTo = function (targetX, targetY) {
+	goTo(targetX, targetY) {
 		this.view.css({left: targetX, top: targetY });
 	}
 
 
-	function attack() {
-		if (action != "attack") {	
+	_attack() {
+		if (this._action != "attack") {	
 			return;
 		}
 
-		if(Entities.distance(robot, target) > 100){
+		if (Entities.distance(this, this._target) > 100){
 			// enemy has gone out of range and player not moving
-			cancel();
+			this.cancel();
 			checkIfAttack(robot);
 			return;
 		}
 
-		target.applyHealth(-5);
+		this._target.applyHealth(-5);
 
-		if(target.health <= 0){
-			if (target.view.is(selectedObject)) {
+		if(this._target.health <= 0){
+			if (this._target.view.is(selectedObject)) {
 				selectedObject = null;
 			}
-			target.die();
+			this._target.die();
 			// look around for someone else to kill!
-			cancel();
-			checkIfAttack(robot);
+			this.cancel();
+			checkIfAttack(this);
 			return;
 		}
 
-		setTimeout(attack, 1000);
+		setTimeout(this._attack.bind(this), 1000);
 	}
 
-	function build() {
-		if (action != "build") {
+	_build() {
+		if (this._action != "build") {
 			return;
 		}
 
-		if (Entities.distance(robot, target) > 100) {
-			cancel();
+		if (Entities.distance(this, this._target) > 100) {
+			this.cancel();
 			checkIfAttack(robot);// or maybe look for other things to build?
 			return;
 		}
 
-		target.build(5);
+		this._target.build(5);
 
-		if (target.isFinished()) {
-			target.finish();
-
-			cancel();
+		if (this._target.isFinished()) {
+			this._target.finish();
+			this.cancel();
+			this._continueBuilding();
 			checkIfAttack(robot);
 			return;
 		}
 
-		setTimeout(build, 1000);
+		setTimeout(this._build.bind(this), 1000);
 	}
 
-	function movePlayer() {
-		var position = view.position();
-		var distanceX = target.x - position.left;
-		var distanceY = target.y - position.top;
+	_go() {
+		var position = this.view.position();
+		var distanceX = this._target.left - position.left;
+		var distanceY = this._target.top - position.top;
 		var distance = Util.distance(distanceX, distanceY);
-		if(distance < speed){
+		if(distance < this._speed){
 			// final iteration
-			robot.goTo(target.x, target.y);
-			cancel();
-			callback();
+			this.goTo(this._target.left, this._target.top);
+			this.cancel();
+			if (this._callback !== null) {
+				this._callback();
+			}
 		}else{
-			robot.goLeft(distanceX * (speed/distance));
-			robot.goUp(distanceY * (speed/distance));
-			requestAnimationFrame(movePlayer);
-		}		
+			this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
+			requestAnimationFrame(this._go.bind(this));
+		}
 	}
 
-	this.getTarget = function () {
-		return target;
-	};
+	_continueBuilding() {
+		var robot = this;
+		var potentialTargets = Entities.filter(function (entity) {
+			return entity instanceof Building
+				&& !Entities.isEnemy(entity, robot) // same team
+				&& !entity.isFinished();
+		});
 
-	function cancel() {
-		action = null;
-		target = null;
+		if (potentialTargets.length == 0) {
+			// do nothing
+			return;
+		}
+
+		var building;
+		if (potentialTargets.length == 1) {
+			building = potentialTargets[0];
+		} else {
+			var bestBuildingCost = potentialTargets.reduce(function (x, y) {
+				var yCost = Entities.distance(robot, y) + (y.initialHealth - y.health);// distance + remaining progress
+				console.log(Entities.distance(robot, y), y.initialHealth - y.health);
+				return (x[0] < yCost) ? x : [yCost, y];
+			});
+			building = bestBuildingCost[1];
+		}
+
+		robot.go(building.view.position(), function () {
+			robot.build(building);
+		});
 	}
 
-	// event listeners
-	div.click(selectPlayer);
+	getTarget() {
+		return this._target;
+	}
+
+	cancel() {
+		this._action = null;
+		this._target = null;
+	}
 }

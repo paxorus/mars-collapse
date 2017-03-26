@@ -10,24 +10,24 @@ body{
     background-size: cover;
 }
 
+.factory, .base, .robot {
+	position: absolute;
+	cursor: pointer;
+}
 
 .factory {
 	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
-	position: absolute;
 	width: 100px;
 	height: 100px;
 	background-size: 400px 210px;
 	background-position: -100px -50px;
-	cursor: pointer;
 }
 
 .base {
-	position: absolute;
 	left: 400px;
 	width: 150px;
 	height: 100px;
 	background: black;
-	cursor: pointer;
 }
 
 .civ1-base {
@@ -43,23 +43,21 @@ body{
 	background-position-x: -10px;
 }
 
-.civ1, .civ2 {
+.robot {
 	width: 40px;
 	height: 40px;
 	border-radius: 20px;
-	position: absolute;
-	cursor: pointer;
 	z-index: 3;/* below HUD, above buildings */
 }
 
-.civ1{
+.civ1-robot {
 	background-image: url('../images/eskie.jpg');
 	background-size: 40px 60px;
 	background-position: 0 -10px;
 	top: 200px;
 }
 
-.civ2{
+.civ2-robot {
 	background-image: url('../images/beagle.jpg');
 	background-size: 80px 53px;
 	background-position: -18px -7px;

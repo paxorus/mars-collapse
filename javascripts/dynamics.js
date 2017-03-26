@@ -17,7 +17,7 @@ $(document).contextmenu(function (event) {// right-click to deselect
 
 function selectPlayer(event){
 	var entity = Entities.get($(event.target));
-	if (!Entities.is(entity, "Robot")) {
+	if (!(entity instanceof Robot)) {
 		return;
 	}
 
@@ -36,20 +36,28 @@ function selectPlayer(event){
  */
 $(document).click(goAndAttack);
 
-
-function goAndAttack(event) {
-	if (!selectedObject) {
+function attackObject(event) {
+	if (!Entities.is(selectedObject, "Robot")) {
 		return;
 	}
+	var enemyObject = Entities.get($(event.target));
+	var robot = selectedObject;
+
+	robot.go(enemyObject.view.position(), function () {
+		robot.attack(enemyObject);
+	});
+	event.stopPropagation();
+}
+
+
+function goAndAttack(event) {
 	if (!Entities.is(selectedObject, "Robot")) {
 		return;
 	}
 	var target = Util.project(event.clientX, event.clientY);
 	var robot = selectedObject;
 
-	robot.moveTo(target, function () {
-		checkIfAttack(robot);
-	});
+	robot.go(target);
 };
 
 
@@ -78,7 +86,7 @@ function checkIfAttack(player){
 	}
 
 	var enemiesInRange = potentialTargets.filter(function (entity) {
-		return Entities.is(entity, "Robot") // is a robot
+		return entity instanceof Robot // is a robot
 			&& (entity.getTarget() === null || entity.getTarget().health > player.health ); // not attacking its lowest health enemy
 	});
 
@@ -104,17 +112,20 @@ document.addEventListener("keydown", function (event) {
 function activateBuildingMode() {
 	// menu mousemove: stop propagation, hide factory
 	var building = null;
-
 	$(document).off("click");
 
 	$(document).mousemove(function (event) {
-		var position = {left: event.clientX, top: event.clientY};
+		var position = {
+			left: event.clientX + document.body.scrollLeft,
+			top: event.clientY + document.body.scrollTop
+		 };
 		if (building === null) {
 			building = new Factory('civ1', position);
 		} else {
 			building.view.css(position);
 		}
 	});
+
 
 	// goAndBuild()
 	$(document).click(function () {
@@ -123,6 +134,7 @@ function activateBuildingMode() {
 		$(document).on("click", goAndAttack);
 		$(document).off("mousemove");
 		Entities.push(building);
+		building.start();
 
 		// selected player will move to it
 		if (!Entities.is(selectedObject, "Robot")) {
@@ -130,7 +142,7 @@ function activateBuildingMode() {
 		}
 		var robot = selectedObject;
 		var target = Util.project(event.clientX, event.clientY);
-		robot.moveTo(target, function () {			
+		robot.go(target, function () {			
 			robot.build(building);
 		});
 	});
@@ -147,7 +159,7 @@ function recruitBuilder(event) {
 	var robot = selectedObject;
 	var building = Entities.get($(event.target));
 
-	robot.moveTo(target, function () {
+	robot.go(target, function () {
 		robot.build(building);
 	});
 	event.stopPropagation();// click should not propagate to document
