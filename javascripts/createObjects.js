@@ -15,8 +15,11 @@ function updateHud() {
 
 function startCivs(){
 	//In order to add an equal number of circles for each team.. we create a "number" of div objects, then add css properties with "{class: 'civ civ1'}" and div.css(..). Finally append the div in some part of the html.
-	Entities.push(new CivBase('civ1'));
-	Entities.push(new CivBase('civ2'));
+	var base1 = new CivBase('civ1', {top: 80, left: 400});
+	base1.quickstart();
+	var base2 = new CivBase('civ2', {top: 570, left: 400});
+	base2.quickstart();
+	Entities.push(base1, base2);
 
 	for (var i = 0; i < numMines; i++) {
 		Entities.push(new Mine(Util.pick(50, 60)));
@@ -26,10 +29,6 @@ function startCivs(){
 		Entities.push(new Robot('civ1'));
 		Entities.push(new Robot('civ2'));
 	}
-
-	// Entities.push(new Factory('civ1', {top: 100, left: 100}));
-
-	// Entities.push(new Factory('civ1', {top: 100, left: 100}));
 
 	updateHud();
 }

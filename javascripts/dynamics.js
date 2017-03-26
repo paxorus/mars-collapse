@@ -91,57 +91,6 @@ function goTo(event) {
 $(document).click(goTo);
 
 
-
-/**
- * Do building stuff.
- */
-
-document.addEventListener("keydown", function (event) {
-	if (event.keyCode == 32) {// on spacebar, until we have a menu
-		activateBuildingMode();
-		event.preventDefault();// don't scroll down
-	}
-});
-
-function activateBuildingMode() {
-	// menu mousemove: stop propagation, hide factory
-	var building = null;
-	$(document).off("click");
-
-	$(document).mousemove(function (event) {
-		var position = {
-			left: event.clientX + document.body.scrollLeft,
-			top: event.clientY + document.body.scrollTop
-		 };
-		if (building === null) {
-			building = new Factory('civ1', position);
-		} else {
-			building.view.css(position);
-		}
-	});
-
-
-	// goAndBuild()
-	$(document).click(function () {
-		// revert mouse behavior
-		$(document).off("click");
-		$(document).on("click", goTo);
-		$(document).off("mousemove");
-		Entities.push(building);
-		building.start();
-
-		// selected player will move to it
-		if (!Entities.myRobot(selectedObject)) {
-			return;
-		}
-		var robot = selectedObject;
-		var target = Util.project(event.clientX, event.clientY);
-		robot.go(target, function () {			
-			robot.build(building);
-		});
-	});
-}
-
 /**
  * Clicking a building directs the selected Robot to help build it.
  */

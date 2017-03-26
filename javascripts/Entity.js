@@ -76,6 +76,13 @@ class Building extends Entity {
 	isFinished() {
 		return this.health >= this.initialHealth;
 	}
+
+	display() {
+		super.display();
+		if (this.view.css("filter") != "none") {
+			$("#other").text("incomplete");
+		}
+	}
 }
 
 
@@ -83,20 +90,24 @@ class Building extends Entity {
 /**
  * CivBase models the team base.
  */
-class CivBase extends Entity {
-	constructor(team) {
-		super(team);
+class CivBase extends Building {
+	constructor(team, position) {
+		super(team, position, 200);
 		this.type = "CivBase";
 
 		this.view.addClass("base");
-
 		if (team == "civ1") {
 			this.view.addClass("civ1-base");
 		} else {
 			this.view.addClass("civ2-base");
 		}
+	}
 
-		this.addHealthBar(200);
+	quickstart() {
+		// for the initial team bases
+		this.addHealthBar(this.initialHealth);
+		this.view.click(selectObject);
+		this.view.css("filter", "none");
 	}
 }
 
@@ -106,7 +117,7 @@ class CivBase extends Entity {
 class Factory extends Building {
 
 	constructor(team, position) {
-		super(team, position, 50);
+		super(team, position, 75);
 		this.type = "Factory";
 		this.view.addClass("factory");
 	}

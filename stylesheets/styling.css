@@ -24,20 +24,16 @@ body{
 }
 
 .base {
-	left: 400px;
 	width: 150px;
 	height: 100px;
-	background: black;
 }
 
 .civ1-base {
-	top: 80px;
-	background-image: url("../images/base1.jpg");
+	background-image: url('../images/base1.jpg');
 	background-size: cover;
 }
 
 .civ2-base {
-	top: 570px;
 	background-image: url('../images/base2.jpg');
 	background-size: 160px 100px;
 	background-position-x: -10px;
@@ -82,8 +78,8 @@ body{
 	z-index: 5;
 }
 
+
 #profile {
-	/*padding-right: 70px;*/
 	width: 130px;
 }
 
@@ -114,6 +110,39 @@ body{
 	width: 25px;
 	height: 25px;
 }
+
+
+
+/* Menu */
+#menu {
+	position: absolute;
+	top: 0;
+	left: 50px;
+	height: inherit;
+	/*width: 50px;*/
+}
+.option {
+	width: 50px;
+	height: inherit;
+	display: inline-block;
+	background-size: cover;
+	background-position: center;
+	cursor: pointer;
+}
+.option:hover {
+	filter: brightness(150%);
+}
+#build-factory {
+	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
+}
+#build-base {
+	background-image: url('../images/base1.jpg');
+}
+#build-greenhouse {
+	background-image: url('https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2014/uadocumentar.jpg');
+}
+
+
 .mine {
 	width: 30px;
 	height: 30px;
