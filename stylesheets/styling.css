@@ -64,7 +64,6 @@ body{
 	top: 500px;
 }
 
-
 .health-bar {
 	background-color: #0088FF;
 	position: relative;
@@ -72,15 +71,42 @@ body{
 	top: -13px;
 }
 
+/* Heads-up display */
 #hud-display {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 30%;
+	width: 100%;
 	height: 65px;
 	background-color: rgba(255, 255, 255, 0.5);
 	z-index: 5;
 }
+
+#profile {
+	/*padding-right: 70px;*/
+	width: 130px;
+}
+
+#profile, #thumbnail {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#hud-bar {
+	height: 7px;
+	width: 100px;
+}
+
+#thumbnail {
+	width: 80px;
+	height: 65px;
+	background-size: cover;
+	background-position: center;
+	right: 150px;
+	border: none;
+}
+
 .icon {
 	position: relative;
 	left: 5px;

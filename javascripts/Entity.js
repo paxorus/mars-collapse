@@ -25,6 +25,7 @@ class Entity {
 		// change color
 		var color = Util.rybCurve(this.health / this.initialHealth);
 		this.healthBar.css("background-color", color);
+		Profile.update(this, color);
 	}
 
 	die() {
@@ -32,7 +33,12 @@ class Entity {
 		Entities.remove(this);
 		if (this == selectedObject) {
 			selectedObject = null;
+			Profile.clear();
 		}
+	}
+
+	display() {
+		Profile.display(this);
 	}
 }
 

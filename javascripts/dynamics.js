@@ -1,5 +1,5 @@
 /**
- * Event handlers for
+ * Event handlers for clicking objects and the document.
  *
  * @author Tristan, Cuimei, Prakhar
  */
@@ -13,6 +13,7 @@ $(document).contextmenu(function (event) {
 	if(selectedObject){
 		selectedObject.view.css("opacity", 1);
 		selectedObject = null;
+		Profile.clear();
 	}
 	event.preventDefault();
 });
@@ -29,6 +30,7 @@ function selectObject(event){
 		selectedObject.view.css("opacity", 1);
 	}
 	entity.view.css("opacity", 0.75);
+	entity.display();
 
 	if (Entities.myRobot(selectedObject) && Entities.isEnemy(selectedObject, entity)) {
 		declareWar(selectedObject, entity);
@@ -51,7 +53,7 @@ function declareWar(robot, enemyObject) {
 	// start conflict
 	var attackerRobots = Entities.filter(function (entity) {
 		return entity instanceof Robot // is a robot
-			&& (entity.getAction() === null || entity.getAction() == "attack");
+			&& (entity.action === null || entity.action == "attack");
 	});
 
 	attackerRobots.forEach(function (attacker) {

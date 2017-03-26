@@ -24,16 +24,16 @@ class Robot extends Entity {
 
 	attack(entity) {
 		this._target = entity;
-		if (this._action != "attack") {
-			this._action = "attack";
+		if (this.action != "attack") {
+			this.action = "attack";
 			setTimeout(this._attack.bind(this), 1000);
 		}
 	}
 
 	build(entity) {
 		this._target = entity;
-		if (this._action != "build") {
-			this._action = "build";
+		if (this.action != "build") {
+			this.action = "build";
 			setTimeout(this._build.bind(this), 1000);
 		}
 		entity.view.click(recruitBuilder);
@@ -42,8 +42,8 @@ class Robot extends Entity {
 	go(newTarget, newCallback) {
 		this._target = newTarget;
 		this._callback = newCallback || null;
-		if (this._action != "go") {
-			this._action = "go";
+		if (this.action != "go") {
+			this.action = "go";
 			this._go();
 		}
 	}
@@ -61,7 +61,7 @@ class Robot extends Entity {
 
 
 	_attack() {
-		if (this._action != "attack") {	
+		if (this.action != "attack") {	
 			return;
 		}
 
@@ -86,15 +86,11 @@ class Robot extends Entity {
 	}
 
 	_build() {
-		if (this._action != "build") {
+		if (this.action != "build") {
 			return;
 		}
 
-		if (Entities.distance(this, this._target) > 100) {
-			this.cancel();
-			checkIfAttack(robot);// or maybe look for other things to build?
-			return;
-		}
+		// buildings can't move
 
 		this._target.build(5);
 
@@ -191,12 +187,26 @@ class Robot extends Entity {
 		});
 	}
 
-	getAction() {
-		return this._action;
+	cancel() {
+		this.action = null;
+		this._target = null;
 	}
 
-	cancel() {
-		this._action = null;
-		this._target = null;
+	display() {
+		super.display();
+		var action = (this.action === null) ? "idle" : this.action;
+		$("#other").text(action + " mode");
+	}
+
+	set action(value) {
+		if (this == selectedObject) {
+			value = (value === null) ? "idle" : value;
+			$("#other").text(value + " mode");
+		}
+		this._action = value;
+	}
+
+	get action() {
+		return this._action;
 	}
 }
