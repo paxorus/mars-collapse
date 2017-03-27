@@ -1,38 +1,22 @@
 /**
- * Implementations of Entity, Building, CivBase, and Factory.
+ * Implementations of the abstract classes Entity, Attackable, and Building.
  *
  * @author Prakhar
  */
 
 /**
- * An Entity can take damage, die, and will update its health bar.
+ * An Entity has a visual representation that will be removed upon death.
+ * It can also be selected.
  */
+
 class Entity {
-	
-	constructor(team) {
-		this.team = team;
+
+	constructor() {
+		this.type = "Unassigned";
 		this.isAlive = true;
 		this.view = $("<div>");
 		this.view.click(selectObject);
 		$(document.body).append(this.view);
-	}
-
-	addHealthBar(health) {
-		this.initialHealth = health;
-		this.health = health;
-		this.healthBar = $("<div>", {class: "health-bar"});
-		this.healthBar.css({marginLeft: (this.view.width() - health) / 2 + "px", width: health});
-		this.view.append(this.healthBar);
-	}
-
-	applyHealth(deltaHealth) {
-		this.health += deltaHealth;
-		// change size
-		this.healthBar.width(this.health);
-		// change color
-		var color = Util.rybCurve(this.health / this.initialHealth);
-		this.healthBar.css("background-color", color);
-		Profile.update(this, color);
 	}
 
 	die() {
@@ -54,12 +38,41 @@ class Entity {
 		}
 	}
 
-	isDead() {
-		return this.health <= 0;
-	}
-
 	display() {
 		Profile.display(this);
+	}
+}
+
+/**
+ * An Attackable can take damage, die, and will update its health bar.
+ */
+class Attackable extends Entity {
+	
+	constructor(team) {
+		super();
+		this.team = team;
+	}
+
+	addHealthBar(health) {
+		this.initialHealth = health;
+		this.health = health;
+		this.healthBar = $("<div>", {class: "health-bar"});
+		this.healthBar.css({marginLeft: (this.view.width() - health) / 2 + "px", width: health});
+		this.view.append(this.healthBar);
+	}
+
+	applyHealth(deltaHealth) {
+		this.health += deltaHealth;
+		// change size
+		this.healthBar.width(this.health);
+		// change color
+		var color = Util.rybCurve(this.health / this.initialHealth);
+		this.healthBar.css("background-color", color);
+		Profile.update(this, color);
+	}
+
+	isDead() {
+		return this.health <= 0;
 	}
 }
 
@@ -67,7 +80,7 @@ class Entity {
  * Buildings will start at 0% health and finish at 100% health.
  * By default, they have 100 health points.
  */
-class Building extends Entity {
+class Building extends Attackable {
 
 	constructor(team, position, initialHealth) {
 		super(team);
@@ -115,67 +128,4 @@ class Building extends Entity {
 		}
 		this._status = value;
 	}
-}
-
-
-
-/**
- * CivBase models the team base.
- */
-class CivBase extends Building {
-	constructor(team, position) {
-		super(team, position, 200);
-		this.type = "CivBase";
-
-		this.view.addClass("base");
-		if (team == "civ1") {
-			this.view.addClass("civ1-base");
-		} else {
-			this.view.addClass("civ2-base");
-		}
-	}
-
-	static get cost() {
-		return [100, 0];
-	}
-
-	quickstart() {
-		// for the initial team bases
-		this.addHealthBar(this.initialHealth);
-		this.view.click(selectObject);
-		this.view.css("filter", "none");
-		this._status = "initial";
-	}
-
-	onDeath() {
-		super.onDeath();
-		var robot = this;
-		var otherTeamBases = Entities.filter(function (entity) {
-			return entity instanceof CivBase && !Entities.isEnemy(entity, robot);
-		});
-		if (otherTeamBases.length == 0) {
-			endGame(this.team);
-		}
-	}
-}
-
-/**
- * A Factory is a Building with 50 health and CSS class .factory.
- */
-class Factory extends Building {
-
-	constructor(team, position) {
-		super(team, position, 75);
-		this.type = "Factory";
-		this.view.addClass("factory");
-	}
-
- 	static get cost() {
- 		return [25, 0];
- 	}
-
- 	produceRobot() {
- 		var robot = new Robot("civ1");
- 		Entities.push(robot);
- 	}
 }

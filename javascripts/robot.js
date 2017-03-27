@@ -3,7 +3,7 @@
  * 
  */
 
-class Robot extends Entity {
+class Robot extends Attackable {
 	constructor(team) {
 		super(team);
 		this.type = "Robot";

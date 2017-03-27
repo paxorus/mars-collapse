@@ -23,15 +23,16 @@ class EntitiesPrototype extends Array {
 	}
 
 	isEnemy(x, y) {
-		return x instanceof Entity && y instanceof Entity && x.team != y.team;
+		// true for opposite team and aliens, false for mines
+		return x instanceof Attackable && y instanceof Attackable && x.team != y.team;
 	}
 
-	is(entity, type) {
-		return entity instanceof Entity && entity.type == type;
+	is(x, type) {
+		return x instanceof Entity && x.type == type;
 	};
 
-	myRobot(entity) {
-		return entity instanceof Robot && entity.team == "civ1";
+	myRobot(x) {
+		return x instanceof Robot && x.team == "civ1";
 	};
 
 	distance(player, entity) {
