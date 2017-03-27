@@ -4,13 +4,20 @@
 var numMines = 10;
 
 var resources = {
-	metal: 25,
+	metal: 100,
 	robot: 3
 };
+
+function pay(cost) {
+	resources.metal -= cost[0];
+	resources.robot -= cost[1];
+	updateHud();
+}
 
 function updateHud() {
 	$("#metal-amount").text(resources.metal);
 	$("#robot-amount").text(resources.robot);
+	Menu.update();
 }
 
 function startCivs(){
@@ -31,4 +38,5 @@ function startCivs(){
 	}
 
 	updateHud();
+	Menu.display();
 }

@@ -1,5 +1,6 @@
 /**
- *
+ * Contains the Profile and Menu objects, as well as the menu button actions.
+ * 
  * @author Jasmine, Prakhar
  */
 var Profile = {
@@ -22,6 +23,7 @@ var Profile = {
 		$("#health-status").text(entity.health + "/" + entity.initialHealth);
 		$("#type").text(entity.team + " " + entity.type);
 		$("#other").text("");
+		Menu.display(entity);
 	},
 
 	clear: function () {
@@ -33,6 +35,43 @@ var Profile = {
 	}
 };
 
+var Menu = {
+	currentSubmenu: $("#default-submenu"),
+	display: function (entity) {
+		if (entity instanceof Factory && entity.status == "complete") {
+			this.show("#factory-submenu");
+		} else {
+			this.show("#default-submenu");
+		}
+	},
+	show: function (id) {
+		this.currentSubmenu.hide();
+		this.currentSubmenu = $(id);
+		this.currentSubmenu.show();
+		this.update();
+	},
+	update: function () {
+		var buttons = this.currentSubmenu.children();
+		buttons.each(function () {
+			if (Menu.canAfford(this.id)) {
+				$(this).css({pointerEvents: "auto", opacity: 1});
+			} else {
+				$(this).css({pointerEvents: "none", opacity: 0.5});
+			}
+		});
+	},
+	canAfford: function (id) {
+		var cost = this.priceOf[id];
+		return cost[0] <= resources.metal;
+	},
+	priceOf: {
+		"build-factory": Factory.cost,
+		"build-base": CivBase.cost,
+		"build-greenhouse": [0, 0],
+		"build-robot": Robot.cost,
+		"build-turret": [0, 0],
+	}
+};
 
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
@@ -45,7 +84,14 @@ $("#build-base").click(function (event) {
 $("#build-greenhouse").click(function () {
 	alert("This doesn't do anything... yet.");
 });
-
+$("#build-robot").click(function (event) {
+	event.stopPropagation();
+	pay(Robot.cost);
+	selectedObject.produceRobot();
+});
+$("#build-turret").click(function () {
+	alert("This doesn't do anything... yet.");
+});
 
 function activatePlacementMode(GenericBuilding) {
 	// menu mousemove: stop propagation, hide factory
@@ -71,6 +117,7 @@ function activatePlacementMode(GenericBuilding) {
 		$(document).on("click", goTo);
 		$(document).off("mousemove");
 
+		pay(GenericBuilding.cost);
 		goAndBuild(building);
 	});
 }

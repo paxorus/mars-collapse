@@ -13,9 +13,15 @@
 		<span id = "robot-amount"></span>
 
 		<div id = "menu">
-			<div class = "option" id = "build-factory" title = "Create factory"></div>
-			<div class = "option" id = "build-base" title = "Create base"></div>
-			<div class = "option" id = "build-greenhouse" title = "Create greenhouse"></div>
+			<div class = "submenu" id = "default-submenu">
+				<div class = "option" id = "build-factory" title = "Create factory"></div>
+				<div class = "option" id = "build-base" title = "Create base"></div>
+				<div class = "option" id = "build-greenhouse" title = "Create greenhouse"></div>
+			</div>
+			<div class = "submenu" id = "factory-submenu">
+				<div class = "option" id = "build-robot" title = "Create robot"></div>
+				<div class = "option" id = "build-turret" title = "Create turret"></div>
+			</div>
 		</div>
 
 		<div id = "profile">
@@ -30,11 +36,12 @@
 	<script src = "javascripts/jquery.js"></script>
 	<script src = "javascripts/Util.js"></script>
 	<script src = "javascripts/Entities.js"></script>
-	<script src = "javascripts/hud.js"></script>
 
 	<script src = "javascripts/Entity.js"></script>
 	<script src = "javascripts/Robot.js"></script>
 	<script src = "javascripts/Mine.js"></script>
+	
+	<script src = "javascripts/hud.js"></script>
 	<script src = "javascripts/dynamics.js"></script>
 	<script src = "javascripts/createObjects.js"></script>
 	<script>

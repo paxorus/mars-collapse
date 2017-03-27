@@ -117,7 +117,7 @@ body{
 #menu {
 	position: absolute;
 	top: 0;
-	left: 50px;
+	left: 80px;
 	height: inherit;
 	/*width: 50px;*/
 }
@@ -132,6 +132,10 @@ body{
 .option:hover {
 	filter: brightness(150%);
 }
+.submenu {
+	height: inherit;
+	display: none;
+}
 #build-factory {
 	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
 }
@@ -141,7 +145,12 @@ body{
 #build-greenhouse {
 	background-image: url('https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2014/uadocumentar.jpg');
 }
-
+#build-robot {
+	background-image: url('../images/eskie.jpg');
+}
+#build-turret {
+	background-image: url('https://img2.cgtrader.com/items/194155/476c2c398d/turret-sci-fi-lowpoly-3d-model-3d-model-max-obj.jpg');
+}
 
 .mine {
 	width: 30px;
@@ -149,5 +158,3 @@ body{
 	position: absolute;
 	cursor: pointer;
 }
-
-

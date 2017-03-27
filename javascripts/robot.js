@@ -1,5 +1,5 @@
 /**
- * Robot < Entity
+ * Robots can be in idle, attack, build, or go mode.
  * 
  */
 
@@ -22,11 +22,18 @@ class Robot extends Entity {
 	 	this.addHealthBar(50);
  	}
 
+ 	static get cost() {
+ 		return [10, -1];
+ 	}
+
+ 	// Methods for setting the mode.
+
 	attack(entity) {
 		this._target = entity;
 		if (this.action != "attack") {
 			this.action = "attack";
-			setTimeout(this._attack.bind(this), 1000);
+			clearTimeout(this._activity);
+			this._activity = setTimeout(this._attack.bind(this), 1000);
 		}
 	}
 
@@ -34,9 +41,9 @@ class Robot extends Entity {
 		this._target = entity;
 		if (this.action != "build") {
 			this.action = "build";
-			setTimeout(this._build.bind(this), 1000);
+			clearTimeout(this._activity);
+			this._activity = setTimeout(this._build.bind(this), 1000);
 		}
-		entity.view.click(recruitBuilder);
 	}
 
 	go(newTarget, newCallback) {
@@ -44,29 +51,16 @@ class Robot extends Entity {
 		this._callback = newCallback || null;
 		if (this.action != "go") {
 			this.action = "go";
+			clearTimeout(this._activity);
 			this._go();
 		}
 	}
 
-	shift(deltaX, deltaY) {
-		this.view.css({
-			left: this.view.position().left +  deltaX,
-			top: this.view.position().top + deltaY
-		});
-	}
-
-	goTo(targetX, targetY) {
-		this.view.css({left: targetX, top: targetY });
-	}
-
+	// Private methods for the action loop.
 
 	_attack() {
-		if (this.action != "attack") {	
-			return;
-		}
-
 		if (Entities.distance(this, this._target) > 100){
-			// enemy has gone out of range and player not moving
+			// enemy has gone out of range
 			this.cancel();
 			this._continueAttacking();
 			return;
@@ -74,7 +68,7 @@ class Robot extends Entity {
 
 		this._target.applyHealth(-5);
 
-		if(this._target.health <= 0){
+		if(this._target.isDead()){
 			this._target.die();
 			// look around for someone else to kill!
 			this.cancel();
@@ -82,15 +76,11 @@ class Robot extends Entity {
 			return;
 		}
 
-		setTimeout(this._attack.bind(this), 1000);
+		this._activity = setTimeout(this._attack.bind(this), 1000);
 	}
 
 	_build() {
-		if (this.action != "build") {
-			return;
-		}
-
-		// buildings can't move
+		// buildings can't move, so we don't check distance
 
 		this._target.build(5);
 
@@ -101,27 +91,39 @@ class Robot extends Entity {
 			return;
 		}
 
-		setTimeout(this._build.bind(this), 1000);
+		this._activity = setTimeout(this._build.bind(this), 1000);
 	}
 
 	_go() {
+		// _target may be an Entity or jQuery Position object
 		var target = ("view" in this._target) ? this._target.view.position() : this._target;
 		var position = this.view.position();
 		var distanceX = target.left - position.left;
 		var distanceY = target.top - position.top;
 		var distance = Util.distance(distanceX, distanceY);
+
 		if(distance < this._speed){
-			// final iteration
-			this.goTo(target.left, target.top);
+			// close enough, snap to position
+			this.view.css(target);
 			this.cancel();
 			if (this._callback !== null) {
 				this._callback();
 			}
-		}else{
-			this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
-			requestAnimationFrame(this._go.bind(this));
+			return;
 		}
+
+		this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
+		requestAnimationFrame(this._go.bind(this));
 	}
+
+	shift(deltaX, deltaY) {
+		this.view.css({
+			left: this.view.position().left +  deltaX,
+			top: this.view.position().top + deltaY
+		});
+	}
+
+	// Methods for computing a new target.
 
 	_continueAttacking() {
 		var robot = this;
@@ -187,10 +189,24 @@ class Robot extends Entity {
 		});
 	}
 
+	/**
+	 * Causes the action loop to silently exit and triggers the Profile to update.
+	 */
 	cancel() {
 		this.action = null;
 		this._target = null;
+		clearTimeout(this._activity);
 	}
+
+	onDeath() {
+		super.onDeath();
+		if (this.team == "civ1") {
+			resources.robot --;
+			updateHud();
+		}
+	}
+
+	// Methods for updating the Profile.
 
 	display() {
 		super.display();

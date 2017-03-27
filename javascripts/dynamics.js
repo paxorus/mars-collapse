@@ -58,7 +58,6 @@ function declareWar(robot, enemyObject) {
 
 	attackerRobots.forEach(function (attacker) {
 		if (attacker.team == "civ1") {
-
 			attacker.go(enemyObject, function () {
 				attacker.attack(enemyObject);
 			});		
@@ -107,4 +106,16 @@ function recruitBuilder(event) {
 		robot.build(building);
 	});
 	event.stopPropagation();// click should not propagate to document
+}
+
+function endGame(loser) {
+	// Being lazy, just print to console and change the background.
+	if (loser == "civ1") {
+		console.log("You lose.");
+		$("body").css("background-image", "url(images/beagle.jpg)");
+	} else {
+		console.log("You win!");
+		$("body").css("background-image", "url(images/eskie.jpg)");
+	}
+	$("body").css("background-size", "cover");
 }

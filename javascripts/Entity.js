@@ -1,10 +1,17 @@
 /**
+ * Implementations of Entity, Building, CivBase, and Factory.
+ *
+ * @author Prakhar
+ */
+
+/**
  * An Entity can take damage, die, and will update its health bar.
  */
 class Entity {
 	
 	constructor(team) {
 		this.team = team;
+		this.isAlive = true;
 		this.view = $("<div>");
 		this.view.click(selectObject);
 		$(document.body).append(this.view);
@@ -29,12 +36,26 @@ class Entity {
 	}
 
 	die() {
+		// die() may be called multiple times
+		if (this.isAlive) {
+			this.isAlive = false;
+			this.onDeath();
+		}
+	}
+
+	onDeath() {
+		// but onDeath() will only run once
+		this.isAlive = false;
 		this.view.remove();
 		Entities.remove(this);
 		if (this == selectedObject) {
 			selectedObject = null;
 			Profile.clear();
 		}
+	}
+
+	isDead() {
+		return this.health <= 0;
 	}
 
 	display() {
@@ -54,6 +75,7 @@ class Building extends Entity {
 		this.view.css(position);
 		this.view.css("filter", "brightness(50%)");
 		this.view.off("click");
+		this._status = "incomplete";
 	}
 
 	start() {
@@ -71,6 +93,7 @@ class Building extends Entity {
 	finish() {
 		this.view.css("filter", "none");
 		this.view.off("click", recruitBuilder);
+		this.status = "complete";
 	}
 
 	isFinished() {
@@ -79,9 +102,18 @@ class Building extends Entity {
 
 	display() {
 		super.display();
-		if (this.view.css("filter") != "none") {
-			$("#other").text("incomplete");
+		$("#other").text(this.status);
+	}
+
+	get status() {
+		return this._status;
+	}
+
+	set status(value) {
+		if (this == selectedObject) {
+			$("#other").text(value);
 		}
+		this._status = value;
 	}
 }
 
@@ -103,11 +135,27 @@ class CivBase extends Building {
 		}
 	}
 
+	static get cost() {
+		return [100, 0];
+	}
+
 	quickstart() {
 		// for the initial team bases
 		this.addHealthBar(this.initialHealth);
 		this.view.click(selectObject);
 		this.view.css("filter", "none");
+		this._status = "initial";
+	}
+
+	onDeath() {
+		super.onDeath();
+		var robot = this;
+		var otherTeamBases = Entities.filter(function (entity) {
+			return entity instanceof CivBase && !Entities.isEnemy(entity, robot);
+		});
+		if (otherTeamBases.length == 0) {
+			endGame(this.team);
+		}
 	}
 }
 
@@ -121,4 +169,13 @@ class Factory extends Building {
 		this.type = "Factory";
 		this.view.addClass("factory");
 	}
+
+ 	static get cost() {
+ 		return [25, 0];
+ 	}
+
+ 	produceRobot() {
+ 		var robot = new Robot("civ1");
+ 		Entities.push(robot);
+ 	}
 }
