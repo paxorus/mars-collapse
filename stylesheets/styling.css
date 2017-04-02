@@ -182,5 +182,9 @@ body{
 	width: 30px;
 	height: 30px;
 	position: absolute;
+	background-image: url('../images/metal_icon.png');
 	cursor: pointer;
+	background-size: cover;
 }
+
+

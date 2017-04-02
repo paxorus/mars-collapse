@@ -1,7 +1,7 @@
 //This file sets some of the objects within the map
 //It sets the circles that represent players
 
-var numMines = 10;
+var NUM_MINES = 10;
 
 var resources = {
 	metal: 100,
@@ -35,7 +35,7 @@ function startCivs(){
 	base2.quickstart();
 	Entities.push(base1, base2);
 
-	for (var i = 0; i < numMines; i++) {
+	for (var i = 0; i < NUM_MINES; i++) {
 		Entities.push(new Mine(Util.pick(50, 60)));
 	}
 

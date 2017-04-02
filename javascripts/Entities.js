@@ -35,6 +35,10 @@ class EntitiesPrototype extends Array {
 		return x instanceof Robot && x.team == "civ1";
 	};
 
+	// allMines(x) {
+	// 	return x instanceof Mine && x.hasMinerals > 0;
+	// };
+
 	distance(player, entity) {
 		var playerX = (player.view.position().left + player.view.width() / 2);
 		var playerY = (player.view.position().top + player.view.height() / 2);

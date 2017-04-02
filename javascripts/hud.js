@@ -90,13 +90,20 @@ $("#build-factory").click(function (event) {
 	var factory = new Factory('civ1', Util.normalize(event));
 	activatePlacementMode(factory);
 });
+
 $("#build-base").click(function (event) {
 	event.stopPropagation();
 	var base = new CivBase('civ1', Util.normalize(event));
 	activatePlacementMode(base);
 });
-$("#build-greenhouse").click(function (event) {
+
+$("#build-turret").click(function (event) {
 	event.stopPropagation();
+	var turret = new Turret('civ1', Util.normalize(event));
+	activatePlacementMode(turret);
+});
+
+$("#build-greenhouse").click(function () {
 	alert("This doesn't do anything... yet.");
 });
 $("#build-robot").click(function (event) {
@@ -104,11 +111,7 @@ $("#build-robot").click(function (event) {
 	resources.pay(Robot.cost);
 	selectedObject.produceRobot();
 });
-$("#build-turret").click(function (event) {
-	event.stopPropagation();
-	var turret = new Turret('civ1', Util.normalize(event));
-	activatePlacementMode(turret);
-});
+
 
 function activatePlacementMode(building) {
 	Menu.switchShadow(building);

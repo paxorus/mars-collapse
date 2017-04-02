@@ -108,6 +108,25 @@ function recruitBuilder(event) {
 	event.stopPropagation();// click should not propagate to document
 }
 
+/**
+ * Clicking a mine directs the selected Robot to collect minerals.
+ */
+// function recruitMiner(event) {
+// 	if (!Entities.myRobot(selectedObject)) {
+// 		return;
+// 	}
+
+// 	var target = Util.project(event.clientX, event.clientY);	
+// 	var robot = selectedObject;
+// 	var mine = Entities.get($(event.target));
+
+// 	robot.go(target, function () {
+// 		robot.mining(mine);
+// 	});
+// 	event.stopPropagation();// click should not propagate to document
+// }
+
+
 function endGame(loser) {
 	// Being lazy, just print to console and change the background.
 	if (loser == "civ1") {
