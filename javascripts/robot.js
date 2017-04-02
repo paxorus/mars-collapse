@@ -49,11 +49,57 @@ class Robot extends Attackable {
 	go(newTarget, newCallback) {
 		this._target = newTarget;
 		this._callback = newCallback || null;
+		this.enemyTurrets = [];
+		var robot = this;
+		for (var i = 0; i < Entities.length; i ++) {
+			if(Entities[i] instanceof Turret && Entities.isEnemy(Entities[i], robot)){
+				this.enemyTurrets.push(Entities[i]);
+			}
+		}
+		
+
+	
+
 		if (this.action != "go") {
 			this.action = "go";
 			clearTimeout(this._activity);
 			this._go();
 		}
+	}
+
+	_go() {
+		// _target may be an Entity or jQuery Position object
+		var target = ("view" in this._target) ? this._target.view.position() : this._target;
+		var position = this.view.position();
+		var distanceX = target.left - position.left;
+		var distanceY = target.top - position.top;
+		var distance = Util.distance(distanceX, distanceY);
+
+		if(distance < this._speed){
+			// close enough, snap to position
+			this.view.css(target);
+			this.cancel();
+			if (this._callback !== null) {
+				this._callback();
+			}
+			return;
+		}
+
+		this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
+		var robot = this;
+		this.enemyTurrets.forEach(function(turret){
+			if(turret.health > 0 && Entities.distance(turret,robot) < 150 ){
+				turret.attack(robot);			
+			}
+		});
+		requestAnimationFrame(this._go.bind(this));
+	}
+	
+	shift(deltaX, deltaY) {
+		this.view.css({
+			left: this.view.position().left +  deltaX,
+			top: this.view.position().top + deltaY
+		});
 	}
 
 	// Private methods for the action loop.
@@ -94,34 +140,8 @@ class Robot extends Attackable {
 		this._activity = setTimeout(this._build.bind(this), 1000);
 	}
 
-	_go() {
-		// _target may be an Entity or jQuery Position object
-		var target = ("view" in this._target) ? this._target.view.position() : this._target;
-		var position = this.view.position();
-		var distanceX = target.left - position.left;
-		var distanceY = target.top - position.top;
-		var distance = Util.distance(distanceX, distanceY);
+	
 
-		if(distance < this._speed){
-			// close enough, snap to position
-			this.view.css(target);
-			this.cancel();
-			if (this._callback !== null) {
-				this._callback();
-			}
-			return;
-		}
-
-		this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
-		requestAnimationFrame(this._go.bind(this));
-	}
-
-	shift(deltaX, deltaY) {
-		this.view.css({
-			left: this.view.position().left +  deltaX,
-			top: this.view.position().top + deltaY
-		});
-	}
 
 	// Methods for computing a new target.
 
