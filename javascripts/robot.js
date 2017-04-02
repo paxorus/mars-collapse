@@ -46,6 +46,15 @@ class Robot extends Attackable {
 		}
 	}
 
+	mining(entity) {
+		this._target = entity;
+		if(this.action != "mining") {
+			this.action = "mining";
+			clearTimeout(this._activity);
+			this._activity = setTimeout(this._build.bind(this), 1000);
+		}
+	}
+
 	go(newTarget, newCallback) {
 		this._target = newTarget;
 		this._callback = newCallback || null;
@@ -77,6 +86,23 @@ class Robot extends Attackable {
 		}
 
 		this._activity = setTimeout(this._attack.bind(this), 1000);
+	}
+
+	_mining() {
+		// if (Entities.distance(this, this._target) > 100){
+		// 	// mine disappear
+		// 	this.cancel();
+		// 	this._continueMining();
+		// 	return;
+		// }
+		this._target.mining(5);
+		if (this._target.hasMinerals() <= 0) {
+			this._target.die();
+			this.cancel();
+			this._continueMining();
+			return;
+		}
+		this._activity = setTimeout(this._mining.bind(this), 1000);
 	}
 
 	_build() {
@@ -189,6 +215,29 @@ class Robot extends Attackable {
 		});
 	}
 
+	_continueMining() {
+		var robot = this;
+		var potentialTargets = Entities.filter(function (entity) {
+			return entity instanceof Mine;
+		});
+
+		// if (potentialTargets.length == 0) {
+		// 	// do nothing
+		// 	return;
+		// }
+		var mineCostTuples = potentialTargets.map(function (m) {
+			var cost = Entites.distance(robot, m) + 36 * m.amount;
+		});
+		var bestMineCost = mineCostTuples.reduce(function(x, y) {
+			return (x[0] < y[0]) ? x : y;
+		});
+		mine = bestMineCost[1];
+
+		robot.go(mine, function() {
+			robot.mining(mine);
+		});
+
+	}
 	/**
 	 * Causes the action loop to silently exit and triggers the Profile to update.
 	 */

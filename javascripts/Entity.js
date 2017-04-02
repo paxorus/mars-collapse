@@ -41,6 +41,24 @@ class Entity {
 	display() {
 		Profile.display(this);
 	}
+
+	addHealthBar(health) {
+		this.initialHealth = health;
+		this.health = health;
+		this.healthBar = $("<div>", {class: "health-bar"});
+		this.healthBar.css({marginLeft: (this.view.width() - health) / 2 + "px", width: health});
+		this.view.append(this.healthBar);
+	}
+
+	applyHealth(deltaHealth) {
+		this.health += deltaHealth;
+		// change size
+		this.healthBar.width(this.health);
+		// change color
+		var color = Util.rybCurve(this.health / this.initialHealth);
+		this.healthBar.css("background-color", color);
+		Profile.update(this, color);
+	}
 }
 
 /**
