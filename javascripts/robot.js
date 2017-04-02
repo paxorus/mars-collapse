@@ -58,17 +58,8 @@ class Robot extends Attackable {
 	go(newTarget, newCallback) {
 		this._target = newTarget;
 		this._callback = newCallback || null;
-		this.enemyTurrets = [];
 		var robot = this;
-		for (var i = 0; i < Entities.length; i ++) {
-			if(Entities[i] instanceof Turret && Entities.isEnemy(Entities[i], robot)){
-				this.enemyTurrets.push(Entities[i]);
-			}
-		}
 		
-
-	
-
 		if (this.action != "go") {
 			this.action = "go";
 			clearTimeout(this._activity);
@@ -95,12 +86,6 @@ class Robot extends Attackable {
 		}
 
 		this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
-		var robot = this;
-		this.enemyTurrets.forEach(function(turret){
-			if(turret.health > 0 && Entities.distance(turret,robot) < 150 ){
-				turret.attack(robot);			
-			}
-		});
 		requestAnimationFrame(this._go.bind(this));
 	}
 	
@@ -157,6 +142,9 @@ class Robot extends Attackable {
 		this._target.build(5);
 
 		if (this._target.isFinished()) {
+			if(this._target instanceof Turret){
+				this._target.activateRadar();
+			}
 			this._target.finish();
 			this.cancel();
 			this._continueBuilding();
