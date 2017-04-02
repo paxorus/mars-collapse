@@ -92,6 +92,9 @@ class Robot extends Attackable {
 		this._target.build(5);
 
 		if (this._target.isFinished()) {
+			if(this._target instanceof Turret){
+				this._target.activateRadar();
+			}
 			this._target.finish();
 			this.cancel();
 			this._continueBuilding();

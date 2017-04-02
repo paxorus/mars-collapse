@@ -99,7 +99,7 @@ $("#build-base").click(function (event) {
 
 $("#build-turret").click(function (event) {
 	event.stopPropagation();
-	var turret = new Turret('civ1', Util.normalize(event));
+	var turret = new Turret('civ2', Util.normalize(event));
 	activatePlacementMode(turret);
 });
 
@@ -129,7 +129,10 @@ function activatePlacementMode(building) {
 		$(document).off("click");
 		$(document).on("click", goTo);
 		$(document).off("mousemove");
-
+		
+		if(building instanceof Turret){
+			building.createMissile();
+		}
 		resources.buy(building);
 		Menu.buildingShadow = null;
 		goAndBuild(building);

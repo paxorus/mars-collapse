@@ -4,7 +4,7 @@
  * @author Jasmine
  */
 
-var NUM_MINES = 1;
+var NUM_MINES = 10;
 
 var resources = {
 	metal: 1000,
