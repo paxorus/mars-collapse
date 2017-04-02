@@ -37,6 +37,13 @@ var Profile = {
 
 var Menu = {
 	currentSubmenu: $("#default-submenu"),
+	buildingShadow: null,
+	switchShadow: function (building) {
+		if (this.buildingShadow !== null) {
+			this.buildingShadow.die();
+		}
+		this.buildingShadow = building;
+	},
 	display: function (entity) {
 		if (entity instanceof Factory && entity.status == "complete") {
 			this.show("#factory-submenu");
@@ -61,53 +68,55 @@ var Menu = {
 		});
 	},
 	canAfford: function (id) {
-		var cost = this.priceOf[id];
+		var cost = this.priceOfId[id];
 		return cost[0] <= resources.metal;
 	},
-	priceOf: {
+	priceOfId: {
 		"build-factory": Factory.cost,
 		"build-base": CivBase.cost,
 		"build-greenhouse": [0, 0],
 		"build-robot": Robot.cost,
-		"build-turret": [0, 0],
+		"build-turret": Turret.cost
 	}
 };
 
+$("#hud-display").click(function (event) {
+	// prevent placing buildings behind HUD
+	event.stopPropagation();
+});
+
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
-	activatePlacementMode(Factory);
+	var factory = new Factory('civ1', Util.normalize(event));
+	activatePlacementMode(factory);
 });
 $("#build-base").click(function (event) {
 	event.stopPropagation();
-	activatePlacementMode(CivBase);
+	var base = new CivBase('civ1', Util.normalize(event));
+	activatePlacementMode(base);
 });
-$("#build-greenhouse").click(function () {
+$("#build-greenhouse").click(function (event) {
+	event.stopPropagation();
 	alert("This doesn't do anything... yet.");
 });
 $("#build-robot").click(function (event) {
 	event.stopPropagation();
-	pay(Robot.cost);
+	resources.pay(Robot.cost);
 	selectedObject.produceRobot();
 });
-$("#build-turret").click(function () {
-	alert("This doesn't do anything... yet.");
+$("#build-turret").click(function (event) {
+	event.stopPropagation();
+	var turret = new Turret('civ1', Util.normalize(event));
+	activatePlacementMode(turret);
 });
 
-function activatePlacementMode(GenericBuilding) {
-	// menu mousemove: stop propagation, hide factory
-	var building = null;
-	$(document).off("click");
+function activatePlacementMode(building) {
+	Menu.switchShadow(building);
 
+	// change mouse behavior so building shadow follows cursor
+	$(document).off("click");
 	$(document).mousemove(function (event) {
-		var position = {
-			left: event.clientX + document.body.scrollLeft,
-			top: event.clientY + document.body.scrollTop
-		 };
-		if (building === null) {
-			building = new GenericBuilding('civ1', position);
-		} else {
-			building.view.css(position);
-		}
+		building.view.css(Util.normalize(event));
 	});
 
 
@@ -117,7 +126,8 @@ function activatePlacementMode(GenericBuilding) {
 		$(document).on("click", goTo);
 		$(document).off("mousemove");
 
-		pay(GenericBuilding.cost);
+		resources.buy(building);
+		Menu.buildingShadow = null;
 		goAndBuild(building);
 	});
 }

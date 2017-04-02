@@ -5,20 +5,27 @@ var numMines = 10;
 
 var resources = {
 	metal: 100,
-	robot: 3
+	robot: 3,
+	buy: function (entity) {
+		this.pay(this.priceOfType[entity.type]);
+	},
+	pay: function (cost) {
+		this.metal -= cost[0];
+		this.robot -= cost[1];
+		this.update();
+	},
+	update: function () {
+		$("#metal-amount").text(resources.metal);
+		$("#robot-amount").text(resources.robot);
+		Menu.update();		
+	},
+	priceOfType: {
+		"Factory": Factory.cost,
+		"CivBase": CivBase.cost,
+		"Greenhouse": [0, 0],
+		"Turret": Turret.cost
+	}
 };
-
-function pay(cost) {
-	resources.metal -= cost[0];
-	resources.robot -= cost[1];
-	updateHud();
-}
-
-function updateHud() {
-	$("#metal-amount").text(resources.metal);
-	$("#robot-amount").text(resources.robot);
-	Menu.update();
-}
 
 function startCivs(){
 	//In order to add an equal number of circles for each team.. we create a "number" of div objects, then add css properties with "{class: 'civ civ1'}" and div.css(..). Finally append the div in some part of the html.
@@ -37,6 +44,6 @@ function startCivs(){
 		Entities.push(new Robot('civ2'));
 	}
 
-	updateHud();
+	resources.update();
 	Menu.display();
 }

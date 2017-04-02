@@ -56,12 +56,77 @@ class Factory extends Building {
 		this.view.addClass("factory");
 	}
 
+	finish() {
+		super.finish();
+		if (this == selectedObject) {
+			Menu.display(this);
+		}
+	}
+
  	static get cost() {
- 		return [25, 0];
+ 		return [50, 0];
  	}
 
  	produceRobot() {
  		var robot = new Robot("civ1");
  		Entities.push(robot);
  	}
+
+ }
+
+
+class Turret extends Building {
+
+	constructor(team, position) {
+		super(team, position, 10);
+		this.type = "Turret";
+		this.view.addClass("turret");
+		this.turretCannon = $("<div>", {class: "turret-cannon"});
+		this.view.append(this.turretCannon);
+
+	}
+
+	static get cost(){
+		return [25,0];
+	}
+
+	attack(enemy){
+		this._target = enemy.view.position();
+		this._missile = $("<div>", {class: "missile"});
+		this._missile.css("left", this.view.position().left + 20);
+		this._missile.css("top", this.view.position().top + 20);
+		$(document.body).append(this._missile);
+		setInterval(this._shoot(), 3000);
+		//this._target = enemy;
+		//this.rotateCannon(enemy.view.position());
+	}
+
+	_shoot(){
+		var speed = 10;
+	
+		var position = this._missile.position();
+		var distanceX = this._target.left - position.left;
+		var distanceY = this._target.top - position.top;
+		var distance = Util.distance(distanceX,distanceY);
+
+		if(distance < speed){
+			return;
+		}
+
+		this._shift(distanceX * (speed/distance), distanceY * (speed/distance));
+		requestAnimationFrame(this._shoot.bind(this));
+	}
+
+
+	_shift(missile, deltaX, deltaY){
+
+		this._missile.css({
+		   left: this._missile.position().left + deltaX,
+		   top: this._missile.position().top + deltaY
+		});
+	}
+
+
+	
+
 }

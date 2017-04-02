@@ -25,5 +25,11 @@ var Util = {
 		x += document.body.scrollLeft - 20;
 		y += document.body.scrollTop - 20;
 		return {left: x, top: y};
+	},
+	normalize: function (event) {
+		return {
+			left: event.clientX + document.body.scrollLeft,
+			top: event.clientY + document.body.scrollTop
+		}
 	}
 };
