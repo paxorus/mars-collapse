@@ -1,10 +1,13 @@
-//This file sets some of the objects within the map
-//It sets the circles that represent players
+/**
+ * Holds the resources{} object and the initialize and termination procedures for the game.
+ *
+ * @author Jasmine
+ */
 
-var NUM_MINES = 10;
+var NUM_MINES = 1;
 
 var resources = {
-	metal: 100,
+	metal: 1000,
 	robot: 3,
 	buy: function (entity) {
 		this.pay(this.priceOfType[entity.type]);
@@ -46,4 +49,16 @@ function startCivs(){
 
 	resources.update();
 	Menu.display();
+}
+
+function endGame(loser) {
+	// Being lazy, just print to console and change the background.
+	if (loser == "civ1") {
+		console.log("You lose.");
+		$("body").css("background-image", "url(images/beagle.jpg)");
+	} else {
+		console.log("You win!");
+		$("body").css("background-image", "url(images/eskie.jpg)");
+	}
+	$("body").css("background-size", "cover");
 }

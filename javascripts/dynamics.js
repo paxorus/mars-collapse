@@ -21,23 +21,44 @@ $(document).contextmenu(function (event) {
 /**
  * Clicking a Robot selects it. Clicking a civ2 directs the selected Robot to attack it.
  */
-function selectObject(event){
+function onEntityClick(event) {
+	event.stopPropagation();// click should not propagate to document
+
 	var entity = Entities.get($(event.target));
-	if (entity === null) {
-		console.log(event.target);
+	var isMyRobot = Entities.myRobot(selectedObject);
+	var coordinates = Util.project(event.clientX, event.clientY);
+
+	if (!isMyRobot) {
+		selectEntity(entity);
+		return;
 	}
+
+	// robot is active, direct it to interact with the clicked object if possible
+	var robot = selectedObject;
+
+	if (Entities.isEnemy(robot, entity)) {
+		// if robot active and enemy has been clicked, robot attacks the enemy
+		declareWar(robot, entity);
+	} else if (entity instanceof Building && !entity.isFinished() && !Entities.isEnemy(robot, entity)) {
+		// if robot active and unfinished building has been clicked, robot helps build it
+		robot.build(entity, coordinates);
+	} else if (entity instanceof Mine) {
+		// if robot active and mine has been clicked, robot collects minerals		
+		robot.mine(entity, coordinates);
+	} else {
+		// else select object
+		selectEntity(entity);
+	}
+
+}
+
+function selectEntity(entity) {
 	if (selectedObject) {
 		selectedObject.view.css("opacity", 1);
 	}
 	entity.view.css("opacity", 0.75);
 	entity.display();
-
-	if (Entities.myRobot(selectedObject) && Entities.isEnemy(selectedObject, entity)) {
-		declareWar(selectedObject, entity);
-	}
-
 	selectedObject = entity;
-	event.stopPropagation();// click should not propagate to document
 }
 
 
@@ -46,32 +67,22 @@ function selectObject(event){
  */
 function declareWar(robot, enemyObject) {
 
-	robot.go(enemyObject, function () {
-		robot.attack(enemyObject);
-	});
+	robot.attack(enemyObject);
 
 	// start conflict
 	var attackerRobots = Entities.filter(function (entity) {
 		return entity instanceof Robot // is a robot
-			&& (entity.action === null || entity.action == "attack");
+			&& (entity.role === null || entity.role == "Warrior");
 	});
 
 	attackerRobots.forEach(function (attacker) {
 		if (attacker.team == "civ1") {
-			attacker.go(enemyObject, function () {
-				attacker.attack(enemyObject);
-			});		
+			attacker.attack(enemyObject);
 		} else {
-			attacker.go(robot, function () {
-				attacker.attack(robot);
-			});
+			attacker.attack(robot);
 		}
 	});
-
-	event.stopPropagation();
 }
-
-
 
 
 /**
@@ -88,53 +99,3 @@ function goTo(event) {
  * Clicking the document directs the selected Robot to the point.
  */
 $(document).click(goTo);
-
-
-/**
- * Clicking a building directs the selected Robot to help build it.
- */
-function recruitBuilder(event) {
-	if (!Entities.myRobot(selectedObject)) {
-		return;
-	}
-
-	var target = Util.project(event.clientX, event.clientY);	
-	var robot = selectedObject;
-	var building = Entities.get($(event.target));
-
-	robot.go(target, function () {
-		robot.build(building);
-	});
-	event.stopPropagation();// click should not propagate to document
-}
-
-/**
- * Clicking a mine directs the selected Robot to collect minerals.
- */
-// function recruitMiner(event) {
-// 	if (!Entities.myRobot(selectedObject)) {
-// 		return;
-// 	}
-
-// 	var target = Util.project(event.clientX, event.clientY);	
-// 	var robot = selectedObject;
-// 	var mine = Entities.get($(event.target));
-
-// 	robot.go(target, function () {
-// 		robot.mining(mine);
-// 	});
-// 	event.stopPropagation();// click should not propagate to document
-// }
-
-
-function endGame(loser) {
-	// Being lazy, just print to console and change the background.
-	if (loser == "civ1") {
-		console.log("You lose.");
-		$("body").css("background-image", "url(images/beagle.jpg)");
-	} else {
-		console.log("You win!");
-		$("body").css("background-image", "url(images/eskie.jpg)");
-	}
-	$("body").css("background-size", "cover");
-}

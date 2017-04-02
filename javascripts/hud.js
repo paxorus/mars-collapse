@@ -115,6 +115,7 @@ $("#build-robot").click(function (event) {
 
 function activatePlacementMode(building) {
 	Menu.switchShadow(building);
+	building.view.off("click");
 
 	// change mouse behavior so building shadow follows cursor
 	$(document).off("click");
@@ -138,6 +139,7 @@ function activatePlacementMode(building) {
 function goAndBuild(building) {
 
 	Entities.push(building);
+	building.view.click(onEntityClick);
 	building.start();
 
 	if (!Entities.myRobot(selectedObject)) {
@@ -145,7 +147,8 @@ function goAndBuild(building) {
 	}
 	var robot = selectedObject;
 	var target = Util.project(event.clientX, event.clientY);
-	robot.go(target, function () {
-		robot.build(building);
-	});
+	// robot.go(target, function () {
+	// 	robot.build(building);
+	// });
+	robot.build(building, target);
 }

@@ -1,7 +1,7 @@
 /**
  * Implementations of the abstract classes Entity, Attackable, and Building.
  *
- * @author Prakhar
+ * @author Jasmine, Prakhar
  */
 
 /**
@@ -15,7 +15,7 @@ class Entity {
 		this.type = "Unassigned";
 		this.isAlive = true;
 		this.view = $("<div>");
-		this.view.click(selectObject);
+		this.view.click(onEntityClick);
 		$(document.body).append(this.view);
 	}
 
@@ -105,15 +105,12 @@ class Building extends Attackable {
 		this.initialHealth = initialHealth || 100;
 		this.view.css(position);
 		this.view.css("filter", "brightness(50%)");
-		this.view.off("click");
 		this._status = "incomplete";
 	}
 
 	start() {
 		this.addHealthBar(this.initialHealth);
 		this.applyHealth(- this.initialHealth);// set health to 0
-		this.view.click(recruitBuilder);
-		this.view.click(selectObject);
 	}
 
 	build(deltaProgress) {
@@ -123,7 +120,6 @@ class Building extends Attackable {
 
 	finish() {
 		this.view.css("filter", "none");
-		this.view.off("click", recruitBuilder);
 		this.status = "complete";
 	}
 

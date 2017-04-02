@@ -1,16 +1,20 @@
 /**
  * Robots can be in idle, attack, build, or go mode.
  * 
+ * @author Jasmine, Prakhar
  */
 
 class Robot extends Attackable {
 	constructor(team) {
 		super(team);
 		this.type = "Robot";
-		this._callback = null;
+		this.role = null;
+		this._SPEED = 3;
+		this._FUZZY = 45;
 		this._target = null;
 		this._action = null;
-		this._speed = 3;
+		this._timeout = null;
+		this._animation = null;
 
 		this.view.addClass("robot");
 		if (team == "civ1") {
@@ -26,88 +30,36 @@ class Robot extends Attackable {
  		return [10, -1];
  	}
 
- 	// Methods for setting the mode.
-
-	attack(entity) {
-		this._target = entity;
-		if (this.action != "attack") {
-			this.action = "attack";
-			clearTimeout(this._activity);
-			this._activity = setTimeout(this._attack.bind(this), 1000);
-		}
-	}
-
-	build(entity) {
-		this._target = entity;
-		if (this.action != "build") {
-			this.action = "build";
-			clearTimeout(this._activity);
-			this._activity = setTimeout(this._build.bind(this), 1000);
-		}
-	}
-
-	mining(entity) {
-		this._target = entity;
-		if(this.action != "mining") {
-			this.action = "mining";
-			clearTimeout(this._activity);
-			this._activity = setTimeout(this._build.bind(this), 1000);
-		}
-	}
-
-	go(newTarget, newCallback) {
-		this._target = newTarget;
-		this._callback = newCallback || null;
-		this.enemyTurrets = [];
+	attack(entity, coordinates) {
 		var robot = this;
-		for (var i = 0; i < Entities.length; i ++) {
-			if(Entities[i] instanceof Turret && Entities.isEnemy(Entities[i], robot)){
-				this.enemyTurrets.push(Entities[i]);
-			}
-		}
-		
-
-	
-
-		if (this.action != "go") {
-			this.action = "go";
-			clearTimeout(this._activity);
-			this._go();
-		}
-	}
-
-	_go() {
-		// _target may be an Entity or jQuery Position object
-		var target = ("view" in this._target) ? this._target.view.position() : this._target;
-		var position = this.view.position();
-		var distanceX = target.left - position.left;
-		var distanceY = target.top - position.top;
-		var distance = Util.distance(distanceX, distanceY);
-
-		if(distance < this._speed){
-			// close enough, snap to position
-			this.view.css(target);
-			this.cancel();
-			if (this._callback !== null) {
-				this._callback();
-			}
-			return;
-		}
-
-		this.shift(distanceX * (this._speed/distance), distanceY * (this._speed/distance));
-		var robot = this;
-		this.enemyTurrets.forEach(function(turret){
-			if(turret.health > 0 && Entities.distance(turret,robot) < 150 ){
-				turret.attack(robot);			
-			}
+		this.changeRole("Warrior");
+		this.go(coordinates || entity, function () {
+			robot._target = entity;
+			robot._timeout = setTimeout(robot._attack.bind(robot), 1000);
 		});
-		requestAnimationFrame(this._go.bind(this));
 	}
-	
-	shift(deltaX, deltaY) {
-		this.view.css({
-			left: this.view.position().left +  deltaX,
-			top: this.view.position().top + deltaY
+
+	build(entity, coordinates) {
+		var robot = this;
+		this.changeRole("Builder");
+		this.go(coordinates || entity, function () {
+			robot._target = entity;
+			robot._timeout = setTimeout(robot._build.bind(robot), 1000);
+		});
+	}
+
+	go(target, callback) {
+		this._target = target;
+		this.cancel();
+		this._animation = requestAnimationFrame(this._go.bind(this, callback || null));
+	}
+
+	mine(entity, coordinates) {
+		var robot = this;
+		this.changeRole("Miner");
+		this.go(coordinates || entity, function () {
+			robot._target = entity;
+			robot._timeout = setTimeout(robot._mine.bind(robot), 1000);
 		});
 	}
 
@@ -131,24 +83,7 @@ class Robot extends Attackable {
 			return;
 		}
 
-		this._activity = setTimeout(this._attack.bind(this), 1000);
-	}
-
-	_mining() {
-		// if (Entities.distance(this, this._target) > 100){
-		// 	// mine disappear
-		// 	this.cancel();
-		// 	this._continueMining();
-		// 	return;
-		// }
-		this._target.mining(5);
-		if (this._target.hasMinerals() <= 0) {
-			this._target.die();
-			this.cancel();
-			this._continueMining();
-			return;
-		}
-		this._activity = setTimeout(this._mining.bind(this), 1000);
+		this._timeout = setTimeout(this._attack.bind(this), 1000);
 	}
 
 	_build() {
@@ -163,10 +98,47 @@ class Robot extends Attackable {
 			return;
 		}
 
-		this._activity = setTimeout(this._build.bind(this), 1000);
+		this._timeout = setTimeout(this._build.bind(this), 1000);
 	}
 
+	_go(callback) {
+		// _target may be an Entity or jQuery Position object
+		var target = ("view" in this._target) ? this._target.view.position() : this._target;
+		var position = this.view.position();
+		var distanceX = target.left - position.left;
+		var distanceY = target.top - position.top;
+		var distance = Util.distance(distanceX, distanceY);
+
+		if(distance < this._FUZZY){
+			// close enough, stop
+			this.cancel();
+			if (callback !== null) {
+				callback();
+			}
+			return;
+		}
+
+		this.shift(distanceX * (this._SPEED/distance), distanceY * (this._SPEED/distance));
+		this._animation = requestAnimationFrame(this._go.bind(this, callback));
+	}
+
+	_mine() {
+		this._target.mining(5);
+		if (this._target.hasMinerals() <= 0) {
+			this._target.die();
+			this.cancel();
+			this._continueMining();
+			return;
+		}
+		this._timeout = setTimeout(this._mine.bind(this), 1000);
+	}
 	
+	shift(deltaX, deltaY) {
+		this.view.css({
+			left: this.view.position().left +  deltaX,
+			top: this.view.position().top + deltaY
+		});
+	}
 
 
 	// Methods for computing a new target.
@@ -215,9 +187,9 @@ class Robot extends Attackable {
 			return;
 		}
 
-		var building;
+		// var building;
 		if (potentialTargets.length == 1) {
-			building = potentialTargets[0];
+			var building = potentialTargets[0];
 		} else {
 			var buildingCostTuples = potentialTargets.map(function (b) {
 				var cost = Entities.distance(robot, b) + 36 * (b.initialHealth - b.health);// distance + remaining progress
@@ -227,12 +199,10 @@ class Robot extends Attackable {
 			var bestBuildingCost = buildingCostTuples.reduce(function (x, y) {
 				return (x[0] < y[0]) ? x : y;
 			});
-			building = bestBuildingCost[1];
+			var building = bestBuildingCost[1];
 		}
 
-		robot.go(building, function () {
-			robot.build(building);
-		});
+		robot.build(building);
 	}
 
 	_continueMining() {
@@ -241,30 +211,44 @@ class Robot extends Attackable {
 			return entity instanceof Mine;
 		});
 
-		// if (potentialTargets.length == 0) {
-		// 	// do nothing
-		// 	return;
-		// }
-		var mineCostTuples = potentialTargets.map(function (m) {
-			var cost = Entites.distance(robot, m) + 36 * m.amount;
-		});
-		var bestMineCost = mineCostTuples.reduce(function(x, y) {
-			return (x[0] < y[0]) ? x : y;
-		});
-		mine = bestMineCost[1];
+		if (potentialTargets.length == 0) {
+			// do nothing
+			return;
+		}
 
-		robot.go(mine, function() {
-			robot.mining(mine);
-		});
+		if (potentialTargets.length == 1) {
+			var mine = potentialTargets[0];
+		} else {
+			var mineCostTuples = potentialTargets.map(function (m) {
+				var cost = Entities.distance(robot, m) / m.amount;
+				return [cost, m];
+			});
+			var bestMineCost = mineCostTuples.reduce(function(x, y) {
+				return (x[0] < y[0]) ? x : y;
+			});
+			var mine = bestMineCost[1];
+		}
 
+		robot.mine(mine);
 	}
 	/**
 	 * Causes the action loop to silently exit and triggers the Profile to update.
 	 */
 	cancel() {
-		this.action = null;
-		this._target = null;
-		clearTimeout(this._activity);
+		clearTimeout(this._timeout);
+		cancelAnimationFrame(this._animation);
+	}
+
+	changeRole(role) {
+		this.role = role;
+		this.display();
+	}
+
+	display() {
+		super.display();
+		if (this.role !== null) {
+			$("#other").text(this.role);
+		}
 	}
 
 	onDeath() {
@@ -272,25 +256,5 @@ class Robot extends Attackable {
 		if (this.team == "civ1") {
 			resources.pay([0, 1]);
 		}
-	}
-
-	// Methods for updating the Profile.
-
-	display() {
-		super.display();
-		var action = (this.action === null) ? "idle" : this.action;
-		$("#other").text(action + " mode");
-	}
-
-	set action(value) {
-		if (this == selectedObject) {
-			value = (value === null) ? "idle" : value;
-			$("#other").text(value + " mode");
-		}
-		this._action = value;
-	}
-
-	get action() {
-		return this._action;
 	}
 }

@@ -1,6 +1,6 @@
 class Mine extends Entity{
 	constructor(num) {
-		super("civi0");
+		super("civ0");
 		this.type = "Mine";
 		this.amount = num;
 		this.initialAmount = num;
@@ -18,7 +18,7 @@ class Mine extends Entity{
 		// }
 		resources.metal += deltaProgress;
 		this.amount -= deltaProgress;
-		updateHud();
+		resources.update();
 	}
 
 	hasMinerals() {

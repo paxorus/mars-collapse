@@ -1,7 +1,7 @@
 /**
- * Implementations of CivBase and Factory.
+ * Implementations of CivBase, Factory, and Turret.
  *
- * 
+ * @author Tristan, Prakhar
  */
 
 
@@ -28,7 +28,7 @@ class CivBase extends Building {
 	quickstart() {
 		// for the initial team bases
 		this.addHealthBar(this.initialHealth);
-		this.view.click(selectObject);
+		// this.view.click(onEntityClick);
 		this.view.css("filter", "none");
 		this._status = "initial";
 	}

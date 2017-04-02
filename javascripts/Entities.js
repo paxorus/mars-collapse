@@ -5,6 +5,10 @@
  */
 class EntitiesPrototype extends Array {
 	get(jqueryObject) {
+		// clicking accessories should select main object
+		while (!jqueryObject.parent().is("body")) {
+			jqueryObject = jqueryObject.parent();
+		}
 		var domElement = jqueryObject.get(0);
 		for (var i = 0; i < this.length; i ++) {
 			if (domElement == this[i].view.get(0)) {
