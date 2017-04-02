@@ -28,9 +28,10 @@ function startCivs(){
 	base2.quickstart();
 	Entities.push(base1, base2);
 
-	for (var i = 0; i < numMines; i++) {
-		Entities.push(new Mine(Util.pick(50, 60)));
-	}
+	//take away for turret testing
+	// for (var i = 0; i < numMines; i++) {
+	// 	Entities.push(new Mine(Util.pick(50, 60)));
+	// }
 
 	for(var i = 0; i < resources.robot; i++){
 		Entities.push(new Robot('civ1'));

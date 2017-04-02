@@ -81,6 +81,12 @@ $("#build-base").click(function (event) {
 	event.stopPropagation();
 	activatePlacementMode(CivBase);
 });
+
+$("#build-turret").click(function (event) {
+	event.stopPropagation();
+	activatePlacementMode(Turret);
+});
+
 $("#build-greenhouse").click(function () {
 	alert("This doesn't do anything... yet.");
 });
@@ -89,9 +95,7 @@ $("#build-robot").click(function (event) {
 	pay(Robot.cost);
 	selectedObject.produceRobot();
 });
-$("#build-turret").click(function () {
-	alert("This doesn't do anything... yet.");
-});
+
 
 function activatePlacementMode(GenericBuilding) {
 	// menu mousemove: stop propagation, hide factory
@@ -104,7 +108,7 @@ function activatePlacementMode(GenericBuilding) {
 			top: event.clientY + document.body.scrollTop
 		 };
 		if (building === null) {
-			building = new GenericBuilding('civ1', position);
+			building = new GenericBuilding('civ2', position);
 		} else {
 			building.view.css(position);
 		}
