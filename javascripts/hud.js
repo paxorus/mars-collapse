@@ -150,8 +150,5 @@ function goAndBuild(building) {
 	}
 	var robot = selectedObject;
 	var target = Util.project(event.clientX, event.clientY);
-	// robot.go(target, function () {
-	// 	robot.build(building);
-	// });
 	robot.build(building, target);
 }

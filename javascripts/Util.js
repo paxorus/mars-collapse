@@ -1,3 +1,9 @@
+/**
+ * Various utility functions.
+ *
+ * @author Prakhar
+ */
+
 var Util = {
 	distance: function (deltaX, deltaY) {
 		// Euclidean distance

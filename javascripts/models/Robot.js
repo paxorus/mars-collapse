@@ -12,7 +12,6 @@ class Robot extends Attackable {
 		this._SPEED = 3;
 		this._FUZZY = 45;
 		this._target = null;
-		this._action = null;
 		this._timeout = null;
 		this._animation = null;
 
@@ -24,10 +23,15 @@ class Robot extends Attackable {
 		}
 		this.view.css("left", Util.pick(250, 600));
 	 	this.addHealthBar(50);
+
+	 	if (team == "civ1") {
+		 	resources.robot ++;
+		 	resources.update();	
+	 	}
  	}
 
  	static get cost() {
- 		return [10, -1];
+ 		return [10, 0];
  	}
 
 	attack(entity, coordinates) {
@@ -76,8 +80,6 @@ class Robot extends Attackable {
 		this._target.applyHealth(-5);
 
 		if(this._target.isDead()){
-			this._target.die();
-			// look around for someone else to kill!
 			this.cancel();
 			this._continueAttacking();
 			return;
@@ -92,9 +94,6 @@ class Robot extends Attackable {
 		this._target.build(5);
 
 		if (this._target.isFinished()) {
-			if(this._target instanceof Turret){
-				this._target.activateRadar();
-			}
 			this._target.finish();
 			this.cancel();
 			this._continueBuilding();
@@ -127,8 +126,7 @@ class Robot extends Attackable {
 
 	_mine() {
 		this._target.mining(5);
-		if (this._target.hasMinerals() <= 0) {
-			this._target.die();
+		if (!this._target.hasMinerals()) {
 			this.cancel();
 			this._continueMining();
 			return;
@@ -143,100 +141,38 @@ class Robot extends Attackable {
 		});
 	}
 
-
-	// Methods for computing a new target.
-
 	_continueAttacking() {
-		var robot = this;
-		// identify potential targets: bases, robots, etc.
-		var potentialTargets = Entities.filter(function (entity) {
-			return Entities.isEnemy(robot, entity) // opposite team
-		});
-
-		if(potentialTargets.length == 0){
-			// do nothing
-			return;
-		}
-
-		var enemy;
-		if (potentialTargets.length == 1) {
-			enemy = potentialTargets[0];
+		var enemy = RobotAI.getClosestWeakestEnemy(this);
+		if (enemy !== null) {
+			this.attack(enemy);
 		} else {
-			var enemyCostTuples = potentialTargets.map(function (e) {
-				var cost = Entities.distance(robot, e) + 36 * e.health;// distance + remaining health
-				return [cost, e];
-			});
-			var bestEnemyCost = enemyCostTuples.reduce(function(x, y) {
-				return (x[0] < y[0]) ? x : y;
-			});
-			enemy = bestEnemyCost[1];
+			this.finish();
 		}
 
-		robot.go(enemy, function () {
-			robot.attack(enemy);
-		});
 	}
 
 	_continueBuilding() {
-		var robot = this;
-		var potentialTargets = Entities.filter(function (entity) {
-			return entity instanceof Building
-				&& !Entities.isEnemy(entity, robot) // same team
-				&& !entity.isFinished();
-		});
-
-		if (potentialTargets.length == 0) {
-			// do nothing
-			return;
-		}
-
-		// var building;
-		if (potentialTargets.length == 1) {
-			var building = potentialTargets[0];
+		var building = RobotAI.getClosestMostCompleteBuilding(this);
+		if (building !== null) {
+			this.build(building);
 		} else {
-			var buildingCostTuples = potentialTargets.map(function (b) {
-				var cost = Entities.distance(robot, b) + 36 * (b.initialHealth - b.health);// distance + remaining progress
-				return [cost, b];
-			});
-
-			var bestBuildingCost = buildingCostTuples.reduce(function (x, y) {
-				return (x[0] < y[0]) ? x : y;
-			});
-			var building = bestBuildingCost[1];
+			this.finish();
 		}
-
-		robot.build(building);
 	}
 
 	_continueMining() {
-		var robot = this;
-		var potentialTargets = Entities.filter(function (entity) {
-			return entity instanceof Mine;
-		});
-
-		if (potentialTargets.length == 0) {
-			// do nothing
-			return;
-		}
-
-		if (potentialTargets.length == 1) {
-			var mine = potentialTargets[0];
+		var mine = RobotAI.getClosestMostPlentifulMine(this);
+		if (mine !== null) {
+			this.mine(mine);
 		} else {
-			var mineCostTuples = potentialTargets.map(function (m) {
-				var cost = Entities.distance(robot, m) / m.amount;
-				return [cost, m];
-			});
-			var bestMineCost = mineCostTuples.reduce(function(x, y) {
-				return (x[0] < y[0]) ? x : y;
-			});
-			var mine = bestMineCost[1];
+			this.finish();
 		}
-
-		robot.mine(mine);
 	}
-	/**
-	 * Causes the action loop to silently exit and triggers the Profile to update.
-	 */
+
+	finish() {
+		this.role = null;
+	}
+
 	cancel() {
 		clearTimeout(this._timeout);
 		cancelAnimationFrame(this._animation);
@@ -244,18 +180,20 @@ class Robot extends Attackable {
 
 	changeRole(role) {
 		this.role = role;
-		this.display();
+		if (selectedObject == this) {
+			this.display();
+		}
 	}
 
 	display() {
 		super.display();
-		if (this.role !== null) {
+		if (selectedObject == this && this.role !== null) {
 			$("#other").text(this.role);
 		}
 	}
 
-	onDeath() {
-		super.onDeath();
+	die() {
+		super.die();
 		if (this.team == "civ1") {
 			resources.pay([0, 1]);
 		}

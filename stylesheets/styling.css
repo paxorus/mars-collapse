@@ -29,8 +29,8 @@ body{
 	position: absolute;
 	background-color: black;
 	/*background-size: 60px 60px;
-	background-position: -100px -50px;
-*/}
+	background-position: -100px -50px;*/
+}
 .turret-cannon {
 	width: 5px;
 	height: 35px;

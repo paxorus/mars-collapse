@@ -1,7 +1,7 @@
 /**
  * Entities manages all Entity instances and also provides several utility methods.
  *
- * @author Tristan, Cuimei, Prakhar
+ * @author Tristan, Jasmine, Prakhar
  */
 class EntitiesPrototype extends Array {
 	get(jqueryObject) {
@@ -33,15 +33,11 @@ class EntitiesPrototype extends Array {
 
 	is(x, type) {
 		return x instanceof Entity && x.type == type;
-	};
+	}
 
 	myRobot(x) {
 		return x instanceof Robot && x.team == "civ1";
-	};
-
-	// allMines(x) {
-	// 	return x instanceof Mine && x.hasMinerals > 0;
-	// };
+	}
 
 	distance(player, entity) {
 		var playerX = (player.view.position().left + player.view.width() / 2);

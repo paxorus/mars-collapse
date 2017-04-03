@@ -1,7 +1,7 @@
 /**
  * Event handlers for clicking objects and the document.
  *
- * @author Tristan, Cuimei, Prakhar
+ * @author Prakhar
  */
 
 var selectedObject = null;// the last clicked object
@@ -19,7 +19,7 @@ $(document).contextmenu(function (event) {
 });
 
 /**
- * Clicking a Robot selects it. Clicking a civ2 directs the selected Robot to attack it.
+ * Have a Robot interact with an Entity or select the clicked Entity.
  */
 function onEntityClick(event) {
 	event.stopPropagation();// click should not propagate to document
@@ -37,16 +37,12 @@ function onEntityClick(event) {
 	var robot = selectedObject;
 
 	if (Entities.isEnemy(robot, entity)) {
-		// if robot active and enemy has been clicked, robot attacks the enemy
 		declareWar(robot, entity);
 	} else if (entity instanceof Building && !entity.isFinished() && !Entities.isEnemy(robot, entity)) {
-		// if robot active and unfinished building has been clicked, robot helps build it
 		robot.build(entity, coordinates);
 	} else if (entity instanceof Mine) {
-		// if robot active and mine has been clicked, robot collects minerals		
 		robot.mine(entity, coordinates);
 	} else {
-		// else select object
 		selectEntity(entity);
 	}
 
