@@ -129,10 +129,6 @@ function activatePlacementMode(building) {
 		$(document).off("click");
 		$(document).on("click", goTo);
 		$(document).off("mousemove");
-		
-		if(building instanceof Turret){
-			building.createMissile();
-		}
 		resources.buy(building);
 		Menu.buildingShadow = null;
 		goAndBuild(building);

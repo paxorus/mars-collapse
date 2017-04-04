@@ -1,3 +1,7 @@
+/**
+ * @author Tristan
+ */
+
 class Turret extends Building {
 
 	constructor(team, position) {
@@ -5,7 +9,15 @@ class Turret extends Building {
 		this.type = "Turret";
 		this.view.addClass("turret");
 		this.turretCannon = $("<div>", {class: "turret-cannon"});
+		var cannonBall = $("<div>", {class: "turret-cannon-ball"});
+		var cannonMuzzle = $("<div>", {class: "turret-cannon-muzzle"});
+		this.turretCannon.append(cannonBall);
+		this.turretCannon.append(cannonMuzzle);
 		this.view.append(this.turretCannon);
+
+
+		this.spinFrame = null;
+		this.angle = Math.PI / 2;
 	}
 
 	static get cost(){
@@ -13,28 +25,26 @@ class Turret extends Building {
 	}
 
 	createMissile(){
-		this._missile = $("<div>", {class: "missile"});
-		this._missile.css("left", this.view.position().left + 20);
-		this._missile.css("top", this.view.position().top + 20);
+		var missile = $("<div>", {class: "missile"});
+		debugger
+		missile.css("left", this.view.position().left + 20);
+		missile.css("top", this.view.position().top + 20);
+		return missile;
 	}
 
 	activateRadar(){
-		var enemyObjectives = [];
-		for (var i = 0; i < Entities.length; i ++) {
-			if(Entities[i] instanceof Robot && Entities.isEnemy(Entities[i], this)){
-				enemyObjectives.push(Entities[i]);
-			}
-		}
 		var turret = this;
-		enemyObjectives.forEach(function(enemy){
-			if(Entities.distance(enemy,turret) < 150){
-				turret.attack(enemy);
-			}
+		var nearbyEnemies = Entities.filter(function(entity){
+			return entity instanceof Robot && Entities.isEnemy(entity, turret) && Entities.distance(entity,turret) < 150;
 		});
-		console.log('5 secs passed');
-		setInterval(this.activateRadar.bind(this), 5000);
 
+		this.stopTracking();
+		// TODO: choose weakest enemy
+		if(nearbyEnemies.length > 0){
+			turret.attack(nearbyEnemies[0]);
+		}
 
+		setTimeout(this.activateRadar.bind(this), 1000);
 	}
 
 	finish() {
@@ -44,36 +54,70 @@ class Turret extends Building {
 
 
 	attack(enemy){
-		this._target = enemy.view.position();
-		$(document.body).append(this._missile);
-		this._shoot()
-		//setInterval(this._shoot(), 3000);
-		//this._target = enemy;
-		//this.rotateCannon(enemy.view.position());
+		var missile = this.createMissile();
+		this._target = enemy;
+		$(document.body).append(missile);
+		this._shoot(missile);
+
+		this.spinFrame = requestAnimationFrame(this._spin.bind(this));
+		
 	}
 
-	_shoot(){
-		var speed = 1;
-	
-		var position = this._missile.position();
-		var distanceX = this._target.left - position.left;
-		var distanceY = this._target.top - position.top;
+	_shoot(missile){
+		var speed = 5;
+		var target = this._target.view.position();
+		// console.log(target);
+		var position = missile.position();
+		var distanceX = target.left - position.left;
+		var distanceY = target.top - position.top;
 		var distance = Util.distance(distanceX,distanceY);
 		if(distance < speed){
-			this._missile.remove();
+			missile.remove();
+			this._target.applyHealth(-5);
 			return;
 		}
 
-		this._shift(distanceX * (speed/distance), distanceY * (speed/distance));
-		requestAnimationFrame(this._shoot.bind(this));
+		this._shift(missile, distanceX * (speed/distance), distanceY * (speed/distance));
+		requestAnimationFrame(this._shoot.bind(this, missile));
 	}
 
+	_spin() {
+		var position = this.view.position();
+		var target = this._target.view.position();
+		var distanceX = target.left - position.left;
+		var distanceY = target.top - position.top;
+		var desiredAngle = Math.atan2(distanceY, distanceX);
+		var deltaAngle = this.angle - desiredAngle;
+		if (deltaAngle < 0) {
+			deltaAngle += 2 * Math.PI;
+		}
+		if (deltaAngle >= Math.PI) {
+			this.angle += 0.03;
+			if (this.angle > Math.PI) {
+				this.angle -= 2 * Math.PI;
+			}
+		} else {
+			this.angle -= 0.03;
+			if (this.angle < -Math.PI) {
+				this.angle += 2 * Math.PI;
+			}
+		}
+		var degrees = this.angle * 180 / Math.PI + 90;
+		var transform = "rotate(" + degrees + "deg)";
+		this.turretCannon.css("transform", transform);
 
-	_shift(deltaX, deltaY){
+		this.spinFrame = requestAnimationFrame(this._spin.bind(this));
+	}
 
-		this._missile.css({
-		   left: this._missile.position().left + deltaX,
-		   top: this._missile.position().top + deltaY
+	stopTracking() {
+		cancelAnimationFrame(this._spinFrame);
+	}
+
+	_shift(missile, deltaX, deltaY){
+
+		missile.css({
+		   left: missile.position().left + deltaX,
+		   top: missile.position().top + deltaY
 		});
 	}
 }
