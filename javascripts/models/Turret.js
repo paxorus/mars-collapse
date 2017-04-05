@@ -5,30 +5,32 @@
 class Turret extends Building {
 
 	constructor(team, position) {
-		super(team, position, 10);
+		super(team, position, 5);
 		this.type = "Turret";
 		this.view.addClass("turret");
 		this.turretCannon = $("<div>", {class: "turret-cannon"});
 		var cannonBall = $("<div>", {class: "turret-cannon-ball"});
-		var cannonMuzzle = $("<div>", {class: "turret-cannon-muzzle"});
+		this.cannonMuzzle = $("<div>", {class: "turret-cannon-muzzle"});
 		this.turretCannon.append(cannonBall);
-		this.turretCannon.append(cannonMuzzle);
+		this.turretCannon.append(this.cannonMuzzle);
 		this.view.append(this.turretCannon);
 
 
 		this.spinFrame = null;
-		this.angle = Math.PI / 2;
+		this.angle = - Math.PI / 2;
 	}
 
 	static get cost(){
 		return [25,0];
 	}
 
+
 	createMissile(){
 		var missile = $("<div>", {class: "missile"});
-		debugger
-		missile.css("left", this.view.position().left + 20);
-		missile.css("top", this.view.position().top + 20);
+		var posX = (this.view.position().left + 24.5)  + ( 15 * Math.cos(this.angle));		
+		var posY = (this.view.position().top + 25) + ( 15 * Math.sin(this.angle));
+		missile.css("left", posX );
+		missile.css("top", posY );
 		return missile;
 	}
 
@@ -42,6 +44,8 @@ class Turret extends Building {
 		// TODO: choose weakest enemy
 		if(nearbyEnemies.length > 0){
 			turret.attack(nearbyEnemies[0]);
+		}else{
+			this._target = null;
 		}
 
 		setTimeout(this.activateRadar.bind(this), 1000);
@@ -54,9 +58,10 @@ class Turret extends Building {
 
 
 	attack(enemy){
-		var missile = this.createMissile();
 		this._target = enemy;
+		var missile = this.createMissile();
 		$(document.body).append(missile);
+		debugger
 		this._shoot(missile);
 
 		this.spinFrame = requestAnimationFrame(this._spin.bind(this));
@@ -81,7 +86,11 @@ class Turret extends Building {
 		requestAnimationFrame(this._shoot.bind(this, missile));
 	}
 
+
 	_spin() {
+		if(this._target === null){
+			return;
+		}
 		var position = this.view.position();
 		var target = this._target.view.position();
 		var distanceX = target.left - position.left;
