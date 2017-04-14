@@ -50,8 +50,35 @@
 	<script src = "javascripts/hud.js"></script>
 	<script src = "javascripts/dynamics.js"></script>
 	<script src = "javascripts/createObjects.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
 	<script>
-	startCivs();
+	var player = localStorage.getItem('gameId')
+	console.log("player = " + player)
+
+	//maybe t
+	var socket = io('http://localhost:5000',{query : "gameId="+ player});
+
+	socket.on("message", function(msg){
+			console.log("player again = " +msg);
+
+
+	})
+
+	
+
+	// var socket = io2();
+	// var player = 0;
+	// socket.on('deciding player number', function(playerNum){
+	// 	if(playerNum === 1){
+	// 		player = 1;
+	// 	}else{
+	// 		player = 2;
+	// 	}
+
+	// 	console.log("player number = " + player);
+	// });
+
+	startCivs(); //we will start civs with a special parameter to indicate whcih civ will the current user control
 	</script>
 </body>
 

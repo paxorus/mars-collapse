@@ -38,7 +38,9 @@
   </body>
 
   <script>
-    var socket = io(); //this sends a connection event to the server
+    var socket = io('http://localhost:5000',{query : "gameId=nil"});
+
+    //localStorage.setItem('testTris','valTris');
     var globalName;
     socket.on('other users', function(connectedMofos){
       connectedMofos.forEach(function(mofo){
@@ -100,6 +102,7 @@
       var link= $('<a>');
       link.attr("href", '/game');
       link.text('game link');
+      localStorage.setItem('gameId', globalName);
       $('#main').append(link);
 
       // $(window.close();
