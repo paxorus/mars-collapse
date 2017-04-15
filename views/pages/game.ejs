@@ -52,17 +52,15 @@
 	<script src = "javascripts/createObjects.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+	//STUUUCK! how do I retrieve the pertinent gameId now that I have one gameId# for each user. (as local storage is the same for all clients) How do I pass the relevant number from index.ejs (GlobalNum) to this page (game.ejs)?, I will therefore try using cookies and see if that information is unique for each client, unlike localstorage.
 	var player = localStorage.getItem('gameId')
-	console.log("player = " + player)
 
-	//maybe t
-	var socket = io('http://localhost:5000',{query : "gameId="+ player});
+	var socket = io('http://localhost:5000',{query : "userId=" + player});
 
-	socket.on("message", function(msg){
-			console.log("player again = " +msg);
+	socket.on("message", function(civNum){
+			console.log("player civ = "+ civNum);
 
-
-	})
+	});
 
 	
 

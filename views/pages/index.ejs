@@ -38,10 +38,12 @@
   </body>
 
   <script>
-    var socket = io('http://localhost:5000',{query : "gameId=nil"});
-
-    //localStorage.setItem('testTris','valTris');
+    
+    var socket = io('http://localhost:5000',{query : "userId=nil"});
+   //clear all the data on local storage
+    
     var globalName;
+    var globalNum; //this variable is used to identify the local storage field
     socket.on('other users', function(connectedMofos){
       connectedMofos.forEach(function(mofo){
          var li = $('<li>');
@@ -64,6 +66,11 @@
       $("#name").text(name);  
     });
 
+    socket.on('local storage', function(playerNum){
+      globalNum = playerNum;
+      localStorage.setItem('gameId'+globalNum , globalName);
+    });
+
     // $('#input').on('input', function(){
     //  var input = $('#input').val()
     //  socket.emit('name change', input);
@@ -71,14 +78,15 @@
     // });
 
      socket.on('status', function(status){
-      if(status == "failure"){
-         console.log('name taken');
-         return;
-      }
-      var name = $("#input").val();
-      globalName = name;
-      $("#name").text(name);  
-    });
+        if(status == "failure"){
+           console.log('name taken');
+           return;
+        }
+        var name = $("#input").val();
+        globalName = name;
+        $("#name").text(name);
+        localStorage.setItem('gameId', globalName);  
+     });
 
     socket.on("war request", function (request) {
       if($('#'+ request.name +'').length ){ //if jquery exists, delete it and add an accept
@@ -102,7 +110,6 @@
       var link= $('<a>');
       link.attr("href", '/game');
       link.text('game link');
-      localStorage.setItem('gameId', globalName);
       $('#main').append(link);
 
       // $(window.close();

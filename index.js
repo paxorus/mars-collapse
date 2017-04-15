@@ -25,12 +25,14 @@ app.get('/game', function(req, res) {
 var users = {};
 var games = {};
 var gameNum = 0;
-io.on('connection', function (socket) {
-
-   if(socket.handshake.query.gameId === "nil"){
+var playerCount =0;
+io.on('connection', function (socket) { 
+   if(socket.handshake.query.userId === "nil"){
+   		playerCount += 1;
 		socket.emit('other users', Object.keys(users));
 		var name  = "user" + Math.floor(Math.random() * 1000);
 		socket.emit('uuid', name);
+		socket.emit('local storage', playerCount);
 		for (var key in users){
 			users[key].emit("other users", [name]);
 		}
@@ -81,12 +83,11 @@ io.on('connection', function (socket) {
 		});
 
 	 }else{
-	 	console.log("query::")
-	 	console.log(socket.handshake.query)
-	 	var player = socket.handshake.query.gameId
-	 	console.log("player");
-	 	console.log(player)
-	 	socket.emit("message", player);
+	 	// console.log("query::")
+	 	// console.log(socket.handshake.query)
+	 	var player = socket.handshake.query.userId
+	 	var civNum = determineCiv(player);
+	 	socket.emit("message", civNum);
 
 
 	 }
@@ -95,6 +96,18 @@ io.on('connection', function (socket) {
 
 
 });
+
+//check wether the user is in the first position, or in the second position of the games hash
+function determineCiv(player){
+	for(var key in games){
+		if(player === games[key][0]){
+			return 1;
+		}if(player === games[key][1]){
+		    return 2;
+		}
+
+	} 
+}
 
 	
 // isGameServer(){
