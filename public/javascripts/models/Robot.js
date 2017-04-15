@@ -5,7 +5,7 @@
  */
 
 class Robot extends Attackable {
-	constructor(team) {
+	constructor(team, isPlayer) { //isPlayer is a variable to know if the current robots being created are the players own team or not
 		super(team);
 		this.type = "Robot";
 		this.role = null;
@@ -24,7 +24,7 @@ class Robot extends Attackable {
 		this.view.css("left", Util.pick(250, 600));
 	 	this.addHealthBar(50);
 
-	 	if (team == "civ1") {
+	 	if (isPlayer) {
 		 	resources.robot ++;
 		 	resources.update();	
 	 	}
@@ -139,6 +139,7 @@ class Robot extends Attackable {
 			left: this.view.position().left +  deltaX,
 			top: this.view.position().top + deltaY
 		});
+		sendMovementSocket(this);
 	}
 
 	_continueAttacking() {

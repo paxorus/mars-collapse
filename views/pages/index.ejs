@@ -43,7 +43,7 @@
    //clear all the data on local storage
     
     var globalName;
-    var globalNum; //this variable is used to identify the local storage field
+
     socket.on('other users', function(connectedMofos){
       connectedMofos.forEach(function(mofo){
          var li = $('<li>');
@@ -63,13 +63,14 @@
 
     socket.on('uuid', function(name){
       globalName = name;
-      $("#name").text(name);  
+      $("#name").text(name);
+      sessionStorage.setItem('gameId', name); 
     });
 
-    socket.on('local storage', function(playerNum){
-      globalNum = playerNum;
-      localStorage.setItem('gameId'+globalNum , globalName);
-    });
+    // socket.on('local storage', function(playerNum){
+    //   globalNum = playerNum;
+    //   localStorage.setItem('gameId'+globalNum , globalName);
+    // });
 
     // $('#input').on('input', function(){
     //  var input = $('#input').val()
@@ -85,7 +86,7 @@
         var name = $("#input").val();
         globalName = name;
         $("#name").text(name);
-        localStorage.setItem('gameId', globalName);  
+        sessionStorage.setItem('gameId', globalName);  
      });
 
     socket.on("war request", function (request) {

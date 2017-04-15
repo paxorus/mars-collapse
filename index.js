@@ -2,8 +2,8 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var LocalStorage = require('node-localstorage').LocalStorage;
-localStorage = new LocalStorage('./scratch');
+// var LocalStorage = require('node-localstorage').LocalStorage;
+// localStorage = new LocalStorage('./scratch');
 // var io2 = io;
 app.use(express.static(__dirname + '/public'));
 
@@ -23,16 +23,15 @@ app.get('/game', function(req, res) {
 //localStorage.setItem('key', 'value');
 
 var users = {};
+var gameUsers = {};
 var games = {};
 var gameNum = 0;
-var playerCount =0;
 io.on('connection', function (socket) { 
    if(socket.handshake.query.userId === "nil"){
-   		playerCount += 1;
 		socket.emit('other users', Object.keys(users));
 		var name  = "user" + Math.floor(Math.random() * 1000);
 		socket.emit('uuid', name);
-		socket.emit('local storage', playerCount);
+		// socket.emit('cookie storage', playerCount);
 		for (var key in users){
 			users[key].emit("other users", [name]);
 		}
@@ -85,10 +84,22 @@ io.on('connection', function (socket) {
 	 }else{
 	 	// console.log("query::")
 	 	// console.log(socket.handshake.query)
-	 	var player = socket.handshake.query.userId
+	 	
+	 	var player = socket.handshake.query.userId;
+	 	gameUsers[player] = socket;
 	 	var civNum = determineCiv(player);
-	 	socket.emit("message", civNum);
-
+	 	var enemyId = determineEnemy(player);
+	 	
+	 	socket.emit("decide civ", civNum);
+		
+		socket.on('new movement', function(mover){
+			if(gameUsers[enemyId] == null){
+				return;
+			}
+			var socketEnemy = gameUsers[enemyId];
+			socketEnemy.emit('apply new movement', mover); 
+			
+		});
 
 	 }
 
@@ -107,6 +118,17 @@ function determineCiv(player){
 		}
 
 	} 
+}
+//obtain the socket of the enemy, (in order to send him data about your moves when playing the game)
+function determineEnemy(player){
+	for(var key in games){
+		if(player === games[key][0]){
+			return games[key][1];
+		}if(player === games[key][1]){
+			return games[key][0];
+		}
+
+	}
 }
 
 	

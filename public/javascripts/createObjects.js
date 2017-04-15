@@ -6,7 +6,7 @@
 
 var NUM_MINES = 10;
 var NUM_ROBOTS = 3;
-
+var playerCiv;
 var resources = {
 	metal: 1000,
 	robot: 0,
@@ -31,7 +31,8 @@ var resources = {
 	}
 };
 
-function startCivs(){
+function startCivs(civ){
+	playerCiv = civ;
 	var base1 = new CivBase('civ1', {top: 80, left: 400});
 	base1.quickstart();
 	var base2 = new CivBase('civ2', {top: 570, left: 400});
@@ -41,11 +42,18 @@ function startCivs(){
 	for (var i = 0; i < NUM_MINES; i++) {
 		Entities.push(new Mine(Util.pick(50, 60)));
 	}
-
-	for(var i = 0; i < NUM_ROBOTS; i++){
-		Entities.push(new Robot('civ1'));
-		Entities.push(new Robot('civ2'));
+	if(civ === 1){
+		for(var i = 0; i < NUM_ROBOTS; i++){
+			Entities.push(new Robot('civ1', true));
+			Entities.push(new Robot('civ2', false));
+		}
+	}else{
+		for(var i = 0; i < NUM_ROBOTS; i++){
+			Entities.push(new Robot('civ1', false));
+			Entities.push(new Robot('civ2', true));
+		}
 	}
+
 
 	resources.update();
 	Menu.display();

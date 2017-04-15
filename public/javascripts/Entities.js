@@ -36,7 +36,11 @@ class EntitiesPrototype extends Array {
 	}
 
 	myRobot(x) {
-		return x instanceof Robot && x.team == "civ1";
+		if(playerCiv === 1){
+			return x instanceof Robot && x.team == "civ1";
+		}else{
+			return x instanceof Robot && x.team == "civ2";
+		}
 	}
 
 	distance(player, entity) {
