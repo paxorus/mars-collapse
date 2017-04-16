@@ -116,8 +116,8 @@
 		switchToSend(button, canceller.name);
 	});
 
-	socket.on('start game', function (number) {
-		localStorage.playerNum = number;
+	socket.on('start game', function (token) {
+		localStorage.entryToken = token;
 		location.href = "/game";
 	});
 

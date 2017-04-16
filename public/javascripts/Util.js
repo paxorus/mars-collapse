@@ -37,5 +37,9 @@ var Util = {
 			left: event.clientX + document.body.scrollLeft,
 			top: event.clientY + document.body.scrollTop
 		}
+	},
+	generateUuid: function () {
+		// TODO
+		return Math.floor(Math.random() * 1e9);
 	}
 };

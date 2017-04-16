@@ -52,41 +52,6 @@
 	<script src = "javascripts/createObjects.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascripts/socket.js"></script>
-
-	<script>
-
-	var civ;
-	var socket = io("/game");
-	socket.emit('entry', localStorage.entryToken);
-
-	socket.on("decide civ", function(civNum){
-		civ = civNum;
-		startCivs(civ);
-		assignSocket(socket);
-
-	});
-
-	socket.on('apply new movement', function(mover){
-		setNewPosition(mover);
-
-	});
-
-	
-
-	// var socket = io2();
-	// var player = 0;
-	// socket.on('deciding player number', function(playerNum){
-	// 	if(playerNum === 1){
-	// 		player = 1;
-	// 	}else{
-	// 		player = 2;
-	// 	}
-
-	// 	console.log("player number = " + player);
-	// });
-
-	 //we will start civs with a special parameter to indicate whcih civ will the current user control
-	</script>
 </body>
 
 

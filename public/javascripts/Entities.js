@@ -18,10 +18,31 @@ class EntitiesPrototype extends Array {
 		return null;
 	}
 
+	push(entity) {
+		super.push(entity);
+		if (entity.team == My.TEAM) {
+			socket.emit('create', serialize(entity));
+		}
+	}
+
 	remove(entity) {
+		this.softRemove(entity);
+		socket.emit('remove', serialize(entity));
+		console.log("sent");
+	}
+
+	softRemove(entity) {
 		for (var i = 0; i < this.length; i ++) {
 			if (this[i] == entity) {
 				this.splice(i, 1);
+			}
+		}
+	}
+
+	lookup(id) {
+		for (var i = 0; i < this.length; i ++) {
+			if (this[i]._id == id) {
+				return this[i];
 			}
 		}
 	}
@@ -36,11 +57,7 @@ class EntitiesPrototype extends Array {
 	}
 
 	myRobot(x) {
-		if(playerCiv === 1){
-			return x instanceof Robot && x.team == "civ1";
-		}else{
-			return x instanceof Robot && x.team == "civ2";
-		}
+		return x instanceof Robot && x.team == My.TEAM;
 	}
 
 	distance(player, entity) {

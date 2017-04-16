@@ -6,7 +6,7 @@
 
 var NUM_MINES = 10;
 var NUM_ROBOTS = 3;
-var playerCiv;
+
 var resources = {
 	metal: 1000,
 	robot: 0,
@@ -31,29 +31,27 @@ var resources = {
 	}
 };
 
-function startCivs(civ){
-	playerCiv = civ;
-	var base1 = new CivBase('civ1', {top: 80, left: 400});
-	base1.quickstart();
-	var base2 = new CivBase('civ2', {top: 570, left: 400});
-	base2.quickstart();
-	Entities.push(base1, base2);
-
-	for (var i = 0; i < NUM_MINES; i++) {
-		Entities.push(new Mine(Util.pick(50, 60)));
-	}
-	if(civ === 1){
-		for(var i = 0; i < NUM_ROBOTS; i++){
-			Entities.push(new Robot('civ1', true));
-			Entities.push(new Robot('civ2', false));
-		}
-	}else{
-		for(var i = 0; i < NUM_ROBOTS; i++){
-			Entities.push(new Robot('civ1', false));
-			Entities.push(new Robot('civ2', true));
-		}
+function startCivs(civ) {
+	// collaboratively generate the map
+	for (var i = 0; i < NUM_MINES / 2; i++) {
+		var mine = new Mine(Util.pick(50, 60));
+		Entities.push(mine);
+		socket.emit('create', serialize(mine));
 	}
 
+	// create your own civilization
+	var baseTop = (My.TEAM == 'civ1') ? 80 : 570;
+	var base = new CivBase(My.TEAM, {top: baseTop, left: 400});
+	base.quickstart();
+	Entities.push(base);
+
+	for(var i = 0; i < NUM_ROBOTS; i++){
+		var position = {
+			left: Util.pick(250, 600),
+			top: (My.TEAM == 'civ1') ? 200 : 500
+		};
+		Entities.push(new Robot(My.TEAM, position));
+	}
 
 	resources.update();
 	Menu.display();
@@ -61,7 +59,7 @@ function startCivs(civ){
 
 function endGame(loser) {
 	// Being lazy, just print to console and change the background.
-	if (loser == "civ1") {
+	if (loser == My.TEAM) {
 		console.log("You lose.");
 		$("body").css("background-image", "url(images/beagle.jpg)");
 	} else {

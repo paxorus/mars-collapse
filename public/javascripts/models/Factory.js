@@ -32,7 +32,7 @@ class Factory extends Building {
  	_dequeue() {
  		var next = this._queue.shift();
  		if (next == "R") {
-	 		var robot = new Robot(this.team,true);
+	 		var robot = new Robot(this.team, this.view.position());
  			Entities.push(robot);
  		}
  		if (this._queue.length > 0) {

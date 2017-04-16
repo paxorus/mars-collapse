@@ -14,6 +14,7 @@ class Entity {
 	constructor() {
 		this.type = "Unassigned";
 		this.isAlive = true;
+		this._id = Util.generateUuid();
 		this.view = $("<div>");
 		this.view.click(onEntityClick);
 		$(document.body).append(this.view);

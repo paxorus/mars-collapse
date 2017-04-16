@@ -26,7 +26,7 @@ class CivBase extends Building {
 		this.addHealthBar(this.initialHealth);
 		// this.view.click(onEntityClick);
 		this.view.css("filter", "none");
-		this._status = "initial";
+		this.status = "initial";
 	}
 
 	die() {

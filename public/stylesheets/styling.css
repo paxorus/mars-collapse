@@ -94,14 +94,12 @@ body{
 	background-image: url('../images/eskie.jpg');
 	background-size: 40px 60px;
 	background-position: 0 -10px;
-	top: 200px;
 }
 
 .civ2-robot {
 	background-image: url('../images/beagle.jpg');
 	background-size: 80px 53px;
 	background-position: -18px -7px;
-	top: 500px;
 }
 
 .health-bar {

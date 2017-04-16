@@ -21,9 +21,10 @@ app.get('/game', function(req, res) {
 	res.render('pages/game');
 });
 
-var users = {};
-// var gameUsers = {};
-// var games = {};
+var users = {};// user to socket
+// var civ1Players = new Set();
+var opponentOf = {};// user to opponent
+var tokenMap = {};// token to user
 
 io.of('/index').on('connection', function (socket) {
 	console.log('connected to /index');
@@ -74,20 +75,30 @@ io.of('/index').on('connection', function (socket) {
 		requested.emit("cancel request", request);
 	});
 
-	socket.on('acceptance', function(acceptance) {
-		if(!(acceptance.name in users)) {
+	socket.on('acceptance', function (acceptance) {
+		var acceptor = acceptance.name;
+		if(!(acceptor in users)) {
 			return;
 		}
-		// launch game for both users
-		socket.emit("start game", 1);
-		var guy = users[acceptance.name];
-		guy.emit("start game", 2);
+		// Entry tokens are UUIDs that convey whether the player is civ1 or civ2.
+		// Since the tokens are stored client-side for persistence across pages,
+		// it is important to mask the role from the user until they assume it.
+
+		// create entry tokens
+		var entryTokens = [generateUuid(), generateUuid()];
+		var guy = users[acceptor];
+
+		// sockets point to each other
+		opponentOf[name] = acceptor;
+		opponentOf[acceptor] = name;
+
 		console.log(name + " accepted " + acceptance.name);
 
-		// create game, map user ids to game
-		// send entry tokens
-		// games[gameNum] = [name,acceptance.name];
-		// gameNum += 1;
+		// launch game for both users
+		socket.emit("start game", entryTokens[0]);
+		tokenMap[entryTokens[0]] = name;
+		guy.emit("start game", entryTokens[1]);
+		tokenMap[entryTokens[1]] = acceptor;
 	});
 
 	socket.on('disconnect', function () {
@@ -100,24 +111,40 @@ io.of('/index').on('connection', function (socket) {
 io.of('/game').on('connection', function (socket) {
 	console.log('connected to /game');
 
-	socket.on('entry', function () {
-		// look up whether in player1 set
-	});
+	socket.on('entry', function (entryToken) {
+		var name = tokenMap[entryToken];
+		delete tokenMap[entryToken];
+		users[name] = socket;
 
- 	// // var player = socket.handshake.query.userId;
- 	// gameUsers[player] = socket;
- 	// var civNum = determineCiv(player);
- 	// var enemyId = determineEnemy(player);
- 	
- 	// socket.emit("decide civ", civNum);
-	
-	socket.on('new movement', function(mover){
-		if(gameUsers[enemyId] == null){
+		if (!(opponentOf[name] in users)) {
 			return;
 		}
-		var socketEnemy = gameUsers[enemyId];
-		socketEnemy.emit('apply new movement', mover); 
+
+		// both players have connected, link them
+		var socket2 = users[opponentOf[name]];
+		socket2.opponent = socket;
+		socket.opponent = socket2;
+
+		var civNumber = (Math.random() < 0.5) + 1;
+		socket.emit('civ number', civNumber);
+		socket2.emit('civ number', 3 - civNumber);
 	});
+
+	socket.on('create', function (data) {
+		socket.opponent.emit('create', data);
+	});
+
+	socket.on('remove', function (data) {
+		socket.opponent.emit('remove', data);
+	});
+
+	// socket.on('new movement', function(mover){
+	// 	if(gameUsers[enemyId] == null){
+	// 		return;
+	// 	}
+	// 	var socketEnemy = gameUsers[enemyId];
+	// 	socketEnemy.emit('apply new movement', mover);
+	// });
 
 	socket.on('disconnect', function () {
 		console.log('disconnected from /game');
@@ -126,75 +153,9 @@ io.of('/game').on('connection', function (socket) {
 
 function generateUuid() {
 	// TODO
-	return Math.floor(Math.random() * 1000);
+	return Math.floor(Math.random() * 1e9);
 }
 
-// //check wether the user is in the first position, or in the second position of the games hash
-// function determineCiv(player){
-// 	for(var key in games){
-// 		if(player === games[key][0]){
-// 			return 1;
-// 		}if(player === games[key][1]){
-// 			return 2;
-// 		}
-// 	} 
-// }
-
-// //obtain the socket of the enemy, (in order to send him data about your moves when playing the game)
-// function determineEnemy(player){
-// 	for(var key in games){
-// 		if(player === games[key][0]){
-// 			return games[key][1];
-// 		}if(player === games[key][1]){
-// 			return games[key][0];
-// 		}
-
-// 	}
-// }
-
-	
-// isGameServer(){
-	
-// 	// for(var key in games){
-// 	// 	 games[key][0] 
-// 	// }
-// 	if(games[0])
-
-// }
-
-
-	// player1 = [];  //array of all the player 1's and all the player 2's
-	// player2 = [];
-	// var num = 0;
-	// io2.on('connection', function(socket){
-	// 	if(num%2 == 0){
-	// 		player1.push(socket);
-	// 		socket.emit('deciding player number', 1);
-	// 	}else{
-	// 		player2.push(socket);
-	// 		socket.emit('deciding player number', 2);
-	// 	}
-	// 	num += 1;
-
-	// 	console.log('player connected in game server');
-
-	// 	socket.on('disconnect', function () {
-	// 		console.log('a player disconnected in game server');
-	
-
-	// 	});
-
-	// });
-
-		
-		// var guy = users[acceptance.name];
-		// guy.emit("start game", 2);
-		// var game = new Game(socket,guy);
-
-	
-
-
-	
 
 
 http.listen(5000, function () {

@@ -87,33 +87,19 @@ $("#hud-display").click(function (event) {
 
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
-	if(playerCiv == 1){
-		var factory = new Factory('civ1', Util.normalize(event));
-	}else{
-		var factory = new Factory('civ2', Util.normalize(event));
-	}
-	
+	var factory = new Factory(My.TEAM, Util.normalize(event));
 	activatePlacementMode(factory);
 });
 
 $("#build-base").click(function (event) {
 	event.stopPropagation();
-	if(playerCiv == 1){
-		var base = new CivBase('civ1', Util.normalize(event));
-	}else{
-		var base = new CivBase('civ2', Util.normalize(event));
-	}
-	
+	var base = new CivBase(My.TEAM, Util.normalize(event));
 	activatePlacementMode(base);
 });
 
 $("#build-turret").click(function (event) {
 	event.stopPropagation();
-	if(playerCiv == 1){
-		var turret = new Turret('civ1', Util.normalize(event));
-	}else{
-		var turret = new Turret('civ2', Util.normalize(event));
-	}
+	var turret = new Turret(My.TEAM, Util.normalize(event));
 	activatePlacementMode(turret);
 });
 
