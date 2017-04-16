@@ -35,10 +35,15 @@ io.of('/index').on('connection', function (socket) {
 	socket.broadcast.emit('insert users', [name]);
 
 	socket.on('name change', function(newName){
-		if(newName in users){
+		if(newName in users) {
 			socket.emit('status', "failure");
 			return;
 		}
+		if (newName === "" || newName.includes(" ")) {
+			// silently exit
+			return;
+		}
+
 		// update hash and emit success
 		var staleName = name;
 		name = newName;
@@ -49,7 +54,7 @@ io.of('/index').on('connection', function (socket) {
 		socket.broadcast.emit('update user', {stale: staleName, fresh: newName});
 	});
 
-	socket.on('war request', function(request){
+	socket.on('war request', function (request) {
 		if(!(request.name in users)){
 			return;
 		}
@@ -57,6 +62,16 @@ io.of('/index').on('connection', function (socket) {
 		var requested = users[request.name];
 		request = {name: name}; 
 		requested.emit("war request", request);
+	});
+
+	socket.on('cancel request', function (request) {
+		if(!(request.name in users)){
+			return;
+		}
+		// transmit request
+		var requested = users[request.name];
+		request = {name: name}; 
+		requested.emit("cancel request", request);
 	});
 
 	socket.on('acceptance', function(acceptance) {

@@ -4,9 +4,30 @@
 		<title>Mars Collapse</title>
 		<style>
 			body {
-				font: Helvetica, Arial;
+				font-family: 'Source Sans Pro', sans-serif;
+				background-image: url('images/request-page-background.jpg');
+				background-size: cover;
+			}
+			#main {
+				background-color: rgba(255, 255, 255, 0.5);
+				position: absolute;
+				left: 5%;
+				width: 86%;
+				top: 10%;
+				padding: 2%;
+			}
+			input[type=text] {
+				outline: none;
+				border-radius: 4px;
+				border: 2px #32bcc1 solid;
+				padding: 5px;
+				background-color: rgba(255, 255, 255, 0.2);
+			}
+			button {
+				cursor: pointer;
 			}
 		</style>
+		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
 	</head>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
@@ -16,10 +37,15 @@
 	<div id = 'main'> 
 		
 		<h2 id='name'></h2>
-		<input id='input'><span id="feedback"></span>
+		Change Name: <input id='input' type="text">&emsp;<span id="feedback"></span>
+		<br>
+		<br>Search
+		<input id="search" type="text">
+		<br>Pending Requests
 		<ul id = "requests">
 		</ul>
 
+		<br>Online Users
 		<ul id='users'>
 		
 		</ul>
@@ -28,7 +54,7 @@
 	</body>
 
 	<script>
-		
+
 	var socket = io("/index");
 	var globalName;
 
@@ -58,7 +84,6 @@
 		globalName = name;
 		$("#name").text(name);
 		$("#input").val(name);
-		// sessionStorage.setItem('gameId', name); 
 	});
 
 	socket.on('status', function(status){
@@ -69,22 +94,26 @@
 		var name = $("#input").val();
 		globalName = name;
 		$("#name").text(name);
-		sessionStorage.setItem('gameId', globalName);
+		$("#feedback").text("Changed!");
 	});
 
 	socket.on("war request", function (request) {
-		if($('#'+ request.name +'').length ) { //if jquery exists, delete it and add an accept
-			$('#'+ request.name +'').remove();
-			var li = $('<li>');
-			li.text(request.name);
-			var button = $('<button>');
-			button.text('Accept');
-			button.click(function() {
-				socket.emit('acceptance', request);
-			});
-			li.append(button);
-			$('#requests').append(li);
-		}
+		var li = $("#" + request.name);
+		$("#requests").append(li);
+		var button = li.children(":first");
+		button.text("Accept");
+		button.off();
+		button.click(function () {
+			socket.emit('acceptance', request);
+		});
+	});
+
+	socket.on("cancel request", function (canceller) {
+		// move #requests -> #users
+		var li = $("#" + canceller.name);
+		$("#users").append(li);
+		var button = li.children(":first");
+		switchToSend(button, canceller.name);
 	});
 
 	socket.on('start game', function (number) {
@@ -94,16 +123,30 @@
 
 	function generateButton(mofo) {
 		var button = $('<button>');
-		button.text('Send Request');
-		button.click(function () {
-			socket.emit('war request', {name: mofo});
-			button.text('Cancel Request');
-		});
+		switchToSend(button, mofo);
 		return button;
 	}
 
-	$('#input').on('input', function(){
-		var input = $('#input').val();
+	function switchToCancel(button, user) {
+		button.text('Cancel Request');
+		button.off();
+		button.click(function () {
+			socket.emit('cancel request', {name: user});
+			switchToSend(button, user);
+		});
+	}
+
+	function switchToSend(button, user) {
+		button.text("Send Request");
+		button.off();
+		button.click(function () {
+			socket.emit('war request', {name: user});
+			switchToCancel(button, user);
+		});
+	}
+
+	$("#input").change(function () {
+		var input = $("#input").val();
 		if (input == globalName) {
 			$("#feedback").text("");
 			return;
@@ -117,7 +160,14 @@
 			return;
 		}
 		socket.emit('name change', input);
-		$("#feedback").text("Changed!");
+	});
+
+	$("#search").change(function () {
+		var query = $("#search").val();
+		$("li").each(function (index, row) {
+			var isMatch = row.id.includes(query);
+			$(row).toggle(isMatch);
+		});
 	});
 	</script>
 </html>
