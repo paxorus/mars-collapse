@@ -55,9 +55,9 @@
 
 	<script>
 
-	var player = sessionStorage.getItem('gameId');
 	var civ;
-	var socket = io('http://localhost:5000',{query : "userId=" + player});
+	var socket = io("/game");
+	socket.emit('entry', localStorage.entryToken);
 
 	socket.on("decide civ", function(civNum){
 		civ = civNum;

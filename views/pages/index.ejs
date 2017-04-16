@@ -1,137 +1,123 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      #form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      #form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      #form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; cursor: pointer;}
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style>
-  </head>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<head>
+		<title>Mars Collapse</title>
+		<style>
+			body {
+				font: Helvetica, Arial;
+			}
+		</style>
+	</head>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
-  <body>
+	<body>
 
-   <div id = 'main'> 
-     
-      <h2 id='name'></h2>
-      <!-- <input id='input'> -->
-      <ul id = "requests">
-      </ul>
+	<div id = 'main'> 
+		
+		<h2 id='name'></h2>
+		<input id='input'><span id="feedback"></span>
+		<ul id = "requests">
+		</ul>
 
+		<ul id='users'>
+		
+		</ul>
+	 </div>
 
+	</body>
 
-      <ul id='users'>
-      
-      </ul>
+	<script>
+		
+	var socket = io("/index");
+	var globalName;
 
+	socket.on('insert users', function (connectedMofos) {
+		connectedMofos.forEach(function (mofo) {
+			 var li = $('<li>', {id: mofo});
+			 // li.attr('id', mofo);
+			 li.text(mofo);
+			 var button = generateButton(mofo);
+			 li.append(button);
+			 $('#users').append(li);
+		});
+	});
 
+	socket.on('update user', function (mofo) {
+		var li = $("#" + mofo.stale);
+		li.text(mofo.fresh);
+		li.attr('id', mofo.fresh);
+		li.append(generateButton(mofo.fresh));
+	});
 
-   </div>
+	socket.on('delete user', function (mofo) {
+		$("#" + mofo).remove();
+	});
 
-  </body>
+	socket.on('uuid', function(name){
+		globalName = name;
+		$("#name").text(name);
+		$("#input").val(name);
+		// sessionStorage.setItem('gameId', name); 
+	});
 
-  <script>
-    
-    var socket = io('http://localhost:5000',{query : "userId=nil"});
-   //clear all the data on local storage
-    
-    var globalName;
+	socket.on('status', function(status){
+		if (status == "failure") {
+			$("#feedback").text("Sorry, that name is already taken.");
+			return;
+		}
+		var name = $("#input").val();
+		globalName = name;
+		$("#name").text(name);
+		sessionStorage.setItem('gameId', globalName);
+	});
 
-    socket.on('other users', function(connectedMofos){
-      connectedMofos.forEach(function(mofo){
-         var li = $('<li>');
-         li.attr('id', mofo);
-         li.text(mofo);
-         var button = $('<button>');
-         button.text('request war');
-         button.click(function(){
-            button.text('war requested');
-            socket.emit('war request', {name: mofo});
-         });
-         li.append(button);
-         $('#users').append(li);
-      });
+	socket.on("war request", function (request) {
+		if($('#'+ request.name +'').length ) { //if jquery exists, delete it and add an accept
+			$('#'+ request.name +'').remove();
+			var li = $('<li>');
+			li.text(request.name);
+			var button = $('<button>');
+			button.text('Accept');
+			button.click(function() {
+				socket.emit('acceptance', request);
+			});
+			li.append(button);
+			$('#requests').append(li);
+		}
+	});
 
-    });
+	socket.on('start game', function (number) {
+		localStorage.playerNum = number;
+		location.href = "/game";
+	});
 
-    socket.on('uuid', function(name){
-      globalName = name;
-      $("#name").text(name);
-      sessionStorage.setItem('gameId', name); 
-    });
+	function generateButton(mofo) {
+		var button = $('<button>');
+		button.text('Send Request');
+		button.click(function () {
+			socket.emit('war request', {name: mofo});
+			button.text('Cancel Request');
+		});
+		return button;
+	}
 
-    // socket.on('local storage', function(playerNum){
-    //   globalNum = playerNum;
-    //   localStorage.setItem('gameId'+globalNum , globalName);
-    // });
-
-    // $('#input').on('input', function(){
-    //  var input = $('#input').val()
-    //  socket.emit('name change', input);
-   
-    // });
-
-     socket.on('status', function(status){
-        if(status == "failure"){
-           console.log('name taken');
-           return;
-        }
-        var name = $("#input").val();
-        globalName = name;
-        $("#name").text(name);
-        sessionStorage.setItem('gameId', globalName);  
-     });
-
-    socket.on("war request", function (request) {
-      if($('#'+ request.name +'').length ){ //if jquery exists, delete it and add an accept
-        $('#'+ request.name +'').remove();
-        var li = $('<li>');
-        li.text(request.name);
-        var button = $('<button>');
-        button.text('accept');
-        button.click(function(){
-          socket.emit('acceptance', request);
-        });
-        li.append(button);
-        $('#requests').append(li);
-      }
-      
-    });
-
-    socket.on('start game', function (number) {
-      $('#main').empty();
-      console.log("You are player "+ number);
-      var link= $('<a>');
-      link.attr("href", '/game');
-      link.text('game link');
-      $('#main').append(link);
-
-      // $(window.close();
-      // window.open("https://www.localhost:500/game.html");
-    });
-
-    // socket.on('chat message', function(msg){  //socket gets a message
-    //   $('#messages').append($('<li>').text(msg));
-    // });
-
-    // $('#m').keypress(function (event) {
-    //   if (event.which == 13) {
-    //     send();
-    //   }
-    // });
-
-    // $('#send').click(send);
-
-    // function send() {
-    //   socket.emit('chat message', $('#m').val());
-    //   $('#m').val('');
-    // }
-  </script>
+	$('#input').on('input', function(){
+		var input = $('#input').val();
+		if (input == globalName) {
+			$("#feedback").text("");
+			return;
+		}
+		if (input === "") {
+			$("#feedback").text("It needs to be at least one character.");
+			return;
+		}
+		if (input.includes(" ")) {
+			$("#feedback").text("No spaces, please.");
+			return;
+		}
+		socket.emit('name change', input);
+		$("#feedback").text("Changed!");
+	});
+	</script>
 </html>

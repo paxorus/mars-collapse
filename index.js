@@ -1,16 +1,17 @@
+/**
+ * Node.js server script.
+ *
+ * @author Tristan, Prakhar
+ */
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-// var LocalStorage = require('node-localstorage').LocalStorage;
-// localStorage = new LocalStorage('./scratch');
-// var io2 = io;
-app.use(express.static(__dirname + '/public'));
 
-// views is directory for all template files
+app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-
 
 app.get('/', function(req, res) {
 	res.render('pages/index');
@@ -20,116 +21,121 @@ app.get('/game', function(req, res) {
 	res.render('pages/game');
 });
 
-//localStorage.setItem('key', 'value');
-
 var users = {};
-var gameUsers = {};
-var games = {};
-var gameNum = 0;
-io.on('connection', function (socket) { 
-   if(socket.handshake.query.userId === "nil"){
-		socket.emit('other users', Object.keys(users));
-		var name  = "user" + Math.floor(Math.random() * 1000);
-		socket.emit('uuid', name);
-		// socket.emit('cookie storage', playerCount);
-		for (var key in users){
-			users[key].emit("other users", [name]);
+// var gameUsers = {};
+// var games = {};
+
+io.of('/index').on('connection', function (socket) {
+	console.log('connected to /index');
+
+	socket.emit('insert users', Object.keys(users));
+	var name = "user" + generateUuid();
+	socket.emit('uuid', name);
+	users[name] = socket;
+	socket.broadcast.emit('insert users', [name]);
+
+	socket.on('name change', function(newName){
+		if(newName in users){
+			socket.emit('status', "failure");
+			return;
 		}
-		users[name] = socket;
+		// update hash and emit success
+		var staleName = name;
+		name = newName;
 
-		// socket.on('name change', function(newName){
-		// 	if(newName in users){
-		// 		socket.emit("status", "failure");
-		// 		return;
-		// 	}
-		// 	delete users[name];
-		// 	users[newName] = socket;
-		// 	name = newName;
-		// 	socket.emit("status", "success");
-			
-		// });
+		delete users[staleName];
+		users[newName] = socket;
+		socket.emit('status', "success");
+		socket.broadcast.emit('update user', {stale: staleName, fresh: newName});
+	});
 
-		socket.on('war request', function(request){
-			// console.log("2nd print == ");
-			// console.log(localStorage);
-			if(!(request.name in users)){
-				return;
-			}
-			var requested = users[request.name];
-			request = {name: name}; 
-			requested.emit("war request",request);
+	socket.on('war request', function(request){
+		if(!(request.name in users)){
+			return;
+		}
+		// transmit request
+		var requested = users[request.name];
+		request = {name: name}; 
+		requested.emit("war request", request);
+	});
 
-		});
+	socket.on('acceptance', function(acceptance) {
+		if(!(acceptance.name in users)) {
+			return;
+		}
+		// launch game for both users
+		socket.emit("start game", 1);
+		var guy = users[acceptance.name];
+		guy.emit("start game", 2);
+		console.log(name + " accepted " + acceptance.name);
 
-		socket.on('acceptance', function(acceptance){
-			if(!(acceptance.name in users)){
-				return;
-			}
-			socket.emit("start game", 1);
-			var guy = users[acceptance.name];
-			guy.emit("start game", 2);
-			games[gameNum] = [name,acceptance.name];
-			gameNum += 1;
+		// create game, map user ids to game
+		// send entry tokens
+		// games[gameNum] = [name,acceptance.name];
+		// gameNum += 1;
+	});
 
-		});	
-
-		console.log('a user connected');
-
-		socket.on('disconnect', function () {
-			console.log('a user disconnected');
-			delete users[name];
-
-		});
-
-	 }else{
-	 	// console.log("query::")
-	 	// console.log(socket.handshake.query)
-	 	
-	 	var player = socket.handshake.query.userId;
-	 	gameUsers[player] = socket;
-	 	var civNum = determineCiv(player);
-	 	var enemyId = determineEnemy(player);
-	 	
-	 	socket.emit("decide civ", civNum);
-		
-		socket.on('new movement', function(mover){
-			if(gameUsers[enemyId] == null){
-				return;
-			}
-			var socketEnemy = gameUsers[enemyId];
-			socketEnemy.emit('apply new movement', mover); 
-			
-		});
-
-	 }
-
-
-
-
+	socket.on('disconnect', function () {
+		console.log('disconnected from /index');
+		delete users[name];
+		socket.broadcast.emit("delete user", name);
+	});
 });
 
-//check wether the user is in the first position, or in the second position of the games hash
-function determineCiv(player){
-	for(var key in games){
-		if(player === games[key][0]){
-			return 1;
-		}if(player === games[key][1]){
-		    return 2;
-		}
+io.of('/game').on('connection', function (socket) {
+	console.log('connected to /game');
 
-	} 
-}
-//obtain the socket of the enemy, (in order to send him data about your moves when playing the game)
-function determineEnemy(player){
-	for(var key in games){
-		if(player === games[key][0]){
-			return games[key][1];
-		}if(player === games[key][1]){
-			return games[key][0];
-		}
+	socket.on('entry', function () {
+		// look up whether in player1 set
+	});
 
-	}
+ 	// // var player = socket.handshake.query.userId;
+ 	// gameUsers[player] = socket;
+ 	// var civNum = determineCiv(player);
+ 	// var enemyId = determineEnemy(player);
+ 	
+ 	// socket.emit("decide civ", civNum);
+	
+	socket.on('new movement', function(mover){
+		if(gameUsers[enemyId] == null){
+			return;
+		}
+		var socketEnemy = gameUsers[enemyId];
+		socketEnemy.emit('apply new movement', mover); 
+	});
+
+	socket.on('disconnect', function () {
+		console.log('disconnected from /game');
+	});
+});
+
+function generateUuid() {
+	// TODO
+	return Math.floor(Math.random() * 1000);
 }
+
+// //check wether the user is in the first position, or in the second position of the games hash
+// function determineCiv(player){
+// 	for(var key in games){
+// 		if(player === games[key][0]){
+// 			return 1;
+// 		}if(player === games[key][1]){
+// 			return 2;
+// 		}
+// 	} 
+// }
+
+// //obtain the socket of the enemy, (in order to send him data about your moves when playing the game)
+// function determineEnemy(player){
+// 	for(var key in games){
+// 		if(player === games[key][0]){
+// 			return games[key][1];
+// 		}if(player === games[key][1]){
+// 			return games[key][0];
+// 		}
+
+// 	}
+// }
 
 	
 // isGameServer(){
