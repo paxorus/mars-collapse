@@ -48,7 +48,7 @@ class Entity {
 		this.view.append(this.healthBar);
 	}
 
-	applyHealth(deltaHealth) {
+	applyHealth(deltaHealth, soft) {
 		this.health = Math.max(this.health + deltaHealth, 0);
 		if (this.health === 0 && this.isAlive) {
 			this.isAlive = false;
@@ -60,6 +60,10 @@ class Entity {
 		var color = Util.rybCurve(this.health / this.initialHealth);
 		this.healthBar.css("background-color", color);
 		Profile.update(this, color);
+
+		if (!soft) {
+			socket.emit('update health', serializeHealth(this._id, deltaHealth));
+		}
 	}
 }
 

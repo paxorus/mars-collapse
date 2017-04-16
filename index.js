@@ -134,17 +134,13 @@ io.of('/game').on('connection', function (socket) {
 		socket.opponent.emit('create', data);
 	});
 
-	socket.on('remove', function (data) {
-		socket.opponent.emit('remove', data);
+	socket.on('update health', function (data) {
+		socket.opponent.emit('update health', data);
 	});
 
-	// socket.on('new movement', function(mover){
-	// 	if(gameUsers[enemyId] == null){
-	// 		return;
-	// 	}
-	// 	var socketEnemy = gameUsers[enemyId];
-	// 	socketEnemy.emit('apply new movement', mover);
-	// });
+	socket.on('update location', function (data) {
+		socket.opponent.emit('update location', data);
+	});
 
 	socket.on('disconnect', function () {
 		console.log('disconnected from /game');

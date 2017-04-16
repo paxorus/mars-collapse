@@ -26,12 +26,6 @@ class EntitiesPrototype extends Array {
 	}
 
 	remove(entity) {
-		this.softRemove(entity);
-		socket.emit('remove', serialize(entity));
-		console.log("sent");
-	}
-
-	softRemove(entity) {
 		for (var i = 0; i < this.length; i ++) {
 			if (this[i] == entity) {
 				this.splice(i, 1);

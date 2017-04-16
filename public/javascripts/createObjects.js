@@ -59,12 +59,16 @@ function startCivs(civ) {
 
 function endGame(loser) {
 	// Being lazy, just print to console and change the background.
-	if (loser == My.TEAM) {
-		console.log("You lose.");
+	if (loser == "civ1") {
 		$("body").css("background-image", "url(images/beagle.jpg)");
 	} else {
-		console.log("You win!");
 		$("body").css("background-image", "url(images/eskie.jpg)");
+	}
+
+	if (loser == My.TEAM) {
+		console.log("You lose.");
+	} else {
+		console.log("You win!");
 	}
 	$("body").css("background-size", "cover");
 }

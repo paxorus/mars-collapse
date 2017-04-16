@@ -13,7 +13,8 @@ socket.on('civ number', function (civNumber) {
 });
 
 socket.on('create', deserialize);
-socket.on('remove', softRemove);
+socket.on('update health', deserializeHealth);
+socket.on('update location', deserializeLocation);
 
 function serialize(entity) {
 	var data = {
@@ -61,13 +62,29 @@ function deserialize(data) {
 	Entities.push(entity);
 }
 
-function softRemove(data) {
+function serializeHealth(id, deltaHealth) {
+	return {
+		id: id,
+		deltaHealth: deltaHealth
+	};
+}
+
+function deserializeHealth(data) {
 	var entity = Entities.lookup(data.id);
-	// soft die
-	entity.view.remove();
-	Entities.softRemove(entity);
-	if (this == selectedObject) {
-		selectedObject = null;
-		Profile.clear();
+	// soft applyHealth()
+	entity.applyHealth(data.deltaHealth, true);
+}
+
+function serializeLocation(id, deltaX, deltaY) {
+	return {
+		id: id,
+		deltaX: deltaX,
+		deltaY: deltaY
 	}
+}
+
+function deserializeLocation(data) {
+	var entity = Entities.lookup(data.id);
+	// soft shift()
+	entity.shift(data.deltaX, data.deltaY, true);
 }

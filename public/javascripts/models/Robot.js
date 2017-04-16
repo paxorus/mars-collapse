@@ -134,12 +134,14 @@ class Robot extends Attackable {
 		this._timeout = setTimeout(this._mine.bind(this), 1000);
 	}
 	
-	shift(deltaX, deltaY) {
+	shift(deltaX, deltaY, soft) {
 		this.view.css({
 			left: this.view.position().left +  deltaX,
 			top: this.view.position().top + deltaY
 		});
-		sendMovementSocket(this);
+		if (!soft) {
+			socket.emit('update location', serializeLocation(this._id, deltaX, deltaY));
+		}
 	}
 
 	_continueAttacking() {
