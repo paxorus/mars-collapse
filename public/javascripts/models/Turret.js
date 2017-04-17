@@ -61,7 +61,6 @@ class Turret extends Building {
 		this._target = enemy;
 		var missile = this.createMissile();
 		$(document.body).append(missile);
-		debugger
 		this._shoot(missile);
 
 		this.spinFrame = requestAnimationFrame(this._spin.bind(this));
@@ -71,7 +70,6 @@ class Turret extends Building {
 	_shoot(missile){
 		var speed = 5;
 		var target = this._target.view.position();
-		// console.log(target);
 		var position = missile.position();
 		var distanceX = target.left - position.left;
 		var distanceY = target.top - position.top;
