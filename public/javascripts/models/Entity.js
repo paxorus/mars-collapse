@@ -54,16 +54,21 @@ class Entity {
 			this.isAlive = false;
 			this.die();
 		}
+
+		this.updateHealthBar();
+
+		if (!soft) {
+			socket.emit('update health', serializeHealth(this._id, deltaHealth));
+		}
+	}
+
+	updateHealthBar() {
 		// change size
 		this.healthBar.width(this.health);
 		// change color
 		var color = Util.rybCurve(this.health / this.initialHealth);
 		this.healthBar.css("background-color", color);
-		Profile.update(this, color);
-
-		if (!soft) {
-			socket.emit('update health', serializeHealth(this._id, deltaHealth));
-		}
+		Profile.update(this, color);		
 	}
 }
 

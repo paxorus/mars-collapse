@@ -72,7 +72,7 @@ function declareWar(robot, enemyObject) {
 	});
 
 	attackerRobots.forEach(function (attacker) {
-		if (attacker.team == "civ1") {
+		if (attacker.team == My.TEAM) {
 			attacker.attack(enemyObject);
 		} else {
 			attacker.attack(robot);

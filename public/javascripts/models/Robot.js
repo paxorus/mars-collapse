@@ -94,7 +94,6 @@ class Robot extends Attackable {
 		this._target.build(5);
 
 		if (this._target.isFinished()) {
-			this._target.finish();
 			this.cancel();
 			this._continueBuilding();
 			return;
@@ -151,7 +150,6 @@ class Robot extends Attackable {
 		} else {
 			this.finish();
 		}
-
 	}
 
 	_continueBuilding() {

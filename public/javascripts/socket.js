@@ -13,9 +13,8 @@ socket.on('civ number', function (civNumber) {
 });
 
 socket.on('create', deserialize);
-socket.on('update health', deserializeHealth);
-socket.on('update location', deserializeLocation);
 
+// Remote Entities.push()
 function serialize(entity) {
 	var data = {
 		type: entity.type,
@@ -62,6 +61,7 @@ function deserialize(data) {
 	Entities.push(entity);
 }
 
+// Remote Entity.applyHealth()
 function serializeHealth(id, deltaHealth) {
 	return {
 		id: id,
@@ -69,12 +69,13 @@ function serializeHealth(id, deltaHealth) {
 	};
 }
 
-function deserializeHealth(data) {
+socket.on('update health', function (data) {
 	var entity = Entities.lookup(data.id);
-	// soft applyHealth()
 	entity.applyHealth(data.deltaHealth, true);
-}
+});
 
+
+// Remote Robot.shift()
 function serializeLocation(id, deltaX, deltaY) {
 	return {
 		id: id,
@@ -83,8 +84,48 @@ function serializeLocation(id, deltaX, deltaY) {
 	}
 }
 
-function deserializeLocation(data) {
+socket.on('update location', function (data) {
 	var entity = Entities.lookup(data.id);
-	// soft shift()
 	entity.shift(data.deltaX, data.deltaY, true);
+});
+
+
+// Remote Building.start()
+function serializeStatus(id) {
+	return {
+		id: id
+	};
 }
+
+socket.on('start construction', function (data) {
+	var entity = Entities.lookup(data.id);
+	entity.start(true);
+});
+
+
+// Remote Building.build()
+function serializeBuild(id, deltaProgress) {
+	return {
+		id: id,
+		deltaProgress: deltaProgress
+	};
+}
+
+socket.on('build', function (data) {
+	var entity = Entities.lookup(data.id);
+	entity.build(data.deltaProgress, true);
+});
+
+
+// Remote Mine.mining()
+function serializeMine(id, deltaProgress) {
+	return {
+		id: id,
+		deltaProgress: deltaProgress
+	};
+}
+
+socket.on('mine', function (data) {
+	var entity = Entities.lookup(data.id);
+	entity.mining(data.deltaProgress, true);
+});

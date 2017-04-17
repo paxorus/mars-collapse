@@ -142,6 +142,18 @@ io.of('/game').on('connection', function (socket) {
 		socket.opponent.emit('update location', data);
 	});
 
+	socket.on('start construction', function (data) {
+		socket.opponent.emit('start construction', data);
+	});
+
+	socket.on('build', function (data) {
+		socket.opponent.emit('build', data);
+	});
+
+	socket.on('mine', function (data) {
+		socket.opponent.emit('mine', data);
+	});
+
 	socket.on('disconnect', function () {
 		console.log('disconnected from /game');
 	});

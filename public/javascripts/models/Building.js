@@ -12,21 +12,35 @@ class Building extends Attackable {
 		this.status = "incomplete";
 	}
 
-	start() {
+	start(soft) {
 		this.addHealthBar(this.initialHealth);
 		this.isAlive = false;// don't die in the next step
-		this.applyHealth(- this.initialHealth);// set health to 0
+		this.applyHealth(- this.initialHealth, true);// set health to 0
 		this.isAlive = true;
+
+		if (!soft) {
+			socket.emit('start construction', serializeStatus(this._id));
+		}
 	}
 
-	build(deltaProgress) {
-		deltaProgress = Math.min(deltaProgress, this.initialHealth - this.health);
-		this.applyHealth(deltaProgress);
+	build(deltaProgress, soft) {
+		this.health = Math.min(this.health + deltaProgress, this.initialHealth);
+		// console.log(this.health == this.initialHealth);
+		// console.log(this.status == "incomplete");
+		if (this.health == this.initialHealth && this.status == "incomplete") {
+			this.status = "complete";
+			this.finish();
+		}
+
+		this.updateHealthBar();
+
+		if (!soft) {
+			socket.emit('build', serializeBuild(this._id, deltaProgress));
+		}
 	}
 
 	finish() {
 		this.view.css("filter", "none");
-		this.status = "complete";
 		if (this == selectedObject) {
 			$("#other").text("complete");
 		}
