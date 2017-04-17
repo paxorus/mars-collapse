@@ -5,7 +5,7 @@
  */
 var My = {};
 var socket = io("/game");
-socket.emit('entry', localStorage.entryToken);
+socket.emit('entry', sessionStorage.entryToken);
 
 socket.on('civ number', function (civNumber) {
 	My.TEAM = "civ" + civNumber;
@@ -69,7 +69,7 @@ function serializeHealth(id, deltaHealth) {
 	};
 }
 
-socket.on('update health', function (data) {
+socket.on('health', function (data) {
 	var entity = Entities.lookup(data.id);
 	entity.applyHealth(data.deltaHealth, true);
 });
@@ -84,7 +84,7 @@ function serializeLocation(id, deltaX, deltaY) {
 	}
 }
 
-socket.on('update location', function (data) {
+socket.on('location', function (data) {
 	var entity = Entities.lookup(data.id);
 	entity.shift(data.deltaX, data.deltaY, true);
 });

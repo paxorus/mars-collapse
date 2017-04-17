@@ -134,13 +134,13 @@ class Robot extends Attackable {
 	}
 	
 	shift(deltaX, deltaY, soft) {
+		if (!soft) {
+			socket.emit('location', serializeLocation(this._id, deltaX, deltaY));
+		}
 		this.view.css({
 			left: this.view.position().left +  deltaX,
 			top: this.view.position().top + deltaY
 		});
-		if (!soft) {
-			socket.emit('update location', serializeLocation(this._id, deltaX, deltaY));
-		}
 	}
 
 	_continueAttacking() {

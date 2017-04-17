@@ -24,19 +24,17 @@ class Building extends Attackable {
 	}
 
 	build(deltaProgress, soft) {
+		if (!soft) {
+			socket.emit('build', serializeBuild(this._id, deltaProgress));
+		}
+
 		this.health = Math.min(this.health + deltaProgress, this.initialHealth);
-		// console.log(this.health == this.initialHealth);
-		// console.log(this.status == "incomplete");
 		if (this.health == this.initialHealth && this.status == "incomplete") {
 			this.status = "complete";
 			this.finish();
 		}
 
 		this.updateHealthBar();
-
-		if (!soft) {
-			socket.emit('build', serializeBuild(this._id, deltaProgress));
-		}
 	}
 
 	finish() {

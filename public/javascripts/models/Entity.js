@@ -49,6 +49,10 @@ class Entity {
 	}
 
 	applyHealth(deltaHealth, soft) {
+		if (!soft) {
+			socket.emit('health', serializeHealth(this._id, deltaHealth));
+		}
+		
 		this.health = Math.max(this.health + deltaHealth, 0);
 		if (this.health === 0 && this.isAlive) {
 			this.isAlive = false;
@@ -56,10 +60,6 @@ class Entity {
 		}
 
 		this.updateHealthBar();
-
-		if (!soft) {
-			socket.emit('update health', serializeHealth(this._id, deltaHealth));
-		}
 	}
 
 	updateHealthBar() {

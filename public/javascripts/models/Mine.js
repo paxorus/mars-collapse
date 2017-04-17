@@ -15,15 +15,15 @@ class Mine extends Entity {
 	}
 
 	mining(deltaProgress, soft) {
-		deltaProgress = Math.min(deltaProgress, this.health);
-		super.applyHealth(-deltaProgress);
-		this.healthBar.css("display", "block");
-
 		if (!soft) {
 			resources.metal += deltaProgress;
 			resources.update();
 			socket.emit('mine', serializeMine(this._id, deltaProgress));
 		}
+
+		deltaProgress = Math.min(deltaProgress, this.health);
+		super.applyHealth(-deltaProgress, true);
+		this.healthBar.css("display", "block");
 	}
 
 	hasMinerals() {

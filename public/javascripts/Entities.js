@@ -4,6 +4,13 @@
  * @author Tristan, Jasmine, Prakhar
  */
 class EntitiesPrototype extends Array {
+
+	constructor() {
+		super();
+		// TODO: garbage collect the map
+		this._map = {};
+	}
+
 	get(jqueryObject) {
 		// clicking accessories should select main object
 		while (!jqueryObject.parent().is("body")) {
@@ -20,6 +27,7 @@ class EntitiesPrototype extends Array {
 
 	push(entity) {
 		super.push(entity);
+		this._map[entity._id] = entity;
 		if (entity.team == My.TEAM) {
 			socket.emit('create', serialize(entity));
 		}
@@ -34,11 +42,7 @@ class EntitiesPrototype extends Array {
 	}
 
 	lookup(id) {
-		for (var i = 0; i < this.length; i ++) {
-			if (this[i]._id == id) {
-				return this[i];
-			}
-		}
+		return this._map[id];
 	}
 
 	isEnemy(x, y) {

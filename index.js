@@ -130,28 +130,12 @@ io.of('/game').on('connection', function (socket) {
 		socket2.emit('civ number', 3 - civNumber);
 	});
 
-	socket.on('create', function (data) {
-		socket.opponent.emit('create', data);
-	});
+	var transmissions = ['create', 'health', 'location', 'start construction', 'build', 'mine'];
 
-	socket.on('update health', function (data) {
-		socket.opponent.emit('update health', data);
-	});
-
-	socket.on('update location', function (data) {
-		socket.opponent.emit('update location', data);
-	});
-
-	socket.on('start construction', function (data) {
-		socket.opponent.emit('start construction', data);
-	});
-
-	socket.on('build', function (data) {
-		socket.opponent.emit('build', data);
-	});
-
-	socket.on('mine', function (data) {
-		socket.opponent.emit('mine', data);
+	transmissions.forEach(function (event) {
+		socket.on(event, function (data) {
+			socket.opponent.emit(event, data);
+		});
 	});
 
 	socket.on('disconnect', function () {

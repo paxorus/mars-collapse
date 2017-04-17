@@ -117,7 +117,7 @@
 	});
 
 	socket.on('start game', function (token) {
-		localStorage.entryToken = token;
+		sessionStorage.entryToken = token;
 		location.href = "/game";
 	});
 
