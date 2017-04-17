@@ -1,0 +1,8 @@
+{
+  "name": "mars-collapse",
+  "description": "Online multiplayer war game",
+  "repository": "https://github.com/Tristanibus/jsgame",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express", "socket.io", "websockets"],
+  "image": "heroku/nodejs"
+}

@@ -1,19 +1,26 @@
 {
-  "name": "experiment_socket",
+  "name": "mars-collapse",
   "version": "1.0.0",
-  "description": "Following socket.io tutorial.",
+  "description": "Online multiplayer war game",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
+    "node",
+    "express",
     "socket.io",
     "websockets"
   ],
-  "author": "Prakhar Sahay",
+  "author": "Prakhar Sahay <tectonic.js@gmail.com>",
+  "contributors": ["Jasmine Zhang", "Tristan Ramirez de Haro"],
   "license": "MIT",
   "dependencies": {
     "express": "^4.14.1",
     "socket.io": "^1.7.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tristanibus/jsgame.git"
   }
 }
