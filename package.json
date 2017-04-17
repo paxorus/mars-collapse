@@ -13,9 +13,13 @@
     "websockets"
   ],
   "author": "Prakhar Sahay <tectonic.js@gmail.com>",
-  "contributors": ["Jasmine Zhang", "Tristan Ramirez de Haro"],
+  "contributors": [
+    "Jasmine Zhang",
+    "Tristan Ramirez de Haro"
+  ],
   "license": "MIT",
   "dependencies": {
+    "ejs": "^2.5.6",
     "express": "^4.14.1",
     "socket.io": "^1.7.2"
   },
