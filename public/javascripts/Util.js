@@ -27,11 +27,59 @@ var Util = {
 	pix: function (x) {
 		return Math.floor(255 * x);
 	},
+
 	project: function (x, y) {
 		x += document.body.scrollLeft - 20;
 		y += document.body.scrollTop - 20;
 		return {left: x, top: y};
 	},
+
+	// project: function(x, y) {
+	// 	var rend = renderer.domElement;
+	// 	var source = new THREE.Vector3(
+	// 		(x - rend.offsetLeft) / rend.width * 2 - 1,
+	// 		-(y - rend.offsetTop) / rend.height * 2 + 1,
+	// 		0
+	// 	);
+	// 	source.unproject(camera);
+	// 	var raycaster = new THREE.Raycaster(
+	// 		camera.position,
+	// 		source.sub(camera.position).normalize()
+	// 	);
+		
+	// };
+
+	project: function (x, y) {
+		// the plane we'll project onto, z=0
+		// var planeMesh = new THREE.Mesh(
+		// 	new THREE.PlaneGeometry(30, 30),
+		// 	new THREE.MeshBasicMaterial()
+		// );
+
+		// essentially boilerplate
+		var rend = renderer.domElement;
+		var source = new THREE.Vector3(
+			(x - rend.offsetLeft) / rend.width * 2 - 1,
+			-(y - rend.offsetTop) / rend.height * 2 + 1,
+			0
+		);
+
+		source.unproject(camera);
+		var raycaster = new THREE.Raycaster(
+			camera.position,
+			source.sub(camera.position).normalize()
+		);
+
+		var hits = raycaster.intersectObject(floor);
+		if (hits.length == 1) {
+			return hits[0].point;
+		}
+	},
+
+
+
+
+
 	normalize: function (event) {
 		return {
 			left: event.clientX + document.body.scrollLeft,

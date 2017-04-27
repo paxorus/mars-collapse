@@ -15,9 +15,9 @@ class Entity {
 		this.type = "Unassigned";
 		this.isAlive = true;
 		this._id = Util.generateUuid();
-		this.view = $("<div>");
-		this.view.click(onEntityClick);
-		$(document.body).append(this.view);
+		// this.view = $("<div>");
+		// this.view.click(onEntityClick);
+		// $(document.body).append(this.view);
 	}
 
 	isDead() {

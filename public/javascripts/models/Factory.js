@@ -6,7 +6,10 @@ class Factory extends Building {
 	constructor(team, position) {
 		super(team, position, 75);
 		this.type = "Factory";
-		this.view.addClass("factory");
+		//this.view.addClass("factory");
+
+		
+
 		this._queue = [];
 		this._timeout = null;
 	}

@@ -9,12 +9,12 @@ class CivBase extends Building {
 		super(team, position, 200);
 		this.type = "CivBase";
 
-		this.view.addClass("base");
-		if (team == "civ1") {
-			this.view.addClass("civ1-base");
-		} else {
-			this.view.addClass("civ2-base");
-		}
+		// this.view.addClass("base");
+		// if (team == "civ1") {
+		// 	this.view.addClass("civ1-base");
+		// } else {
+		// 	this.view.addClass("civ2-base");
+		// }
 	}
 
 	static get cost() {
@@ -23,9 +23,9 @@ class CivBase extends Building {
 
 	quickstart() {
 		// for the initial team bases
-		this.addHealthBar(this.initialHealth);
+		//this.addHealthBar(this.initialHealth);
 		// this.view.click(onEntityClick);
-		this.view.css("filter", "none");
+		//this.view.css("filter", "none");
 		this.status = "initial";
 	}
 

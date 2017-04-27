@@ -87,7 +87,10 @@ $("#hud-display").click(function (event) {
 
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
-	var factory = new Factory(My.TEAM, Util.normalize(event));
+	//var factory = new Factory(My.TEAM, Util.normalize(event));
+	var size = [10, 5, 5];
+	var point = env.project(event.pageX, event.pageY);
+	var factory = env.buildFactory(size, [point.x, point.y, 0], 0x00ff00);
 	activatePlacementMode(factory);
 });
 
@@ -115,12 +118,13 @@ $("#build-robot").click(function (event) {
 
 function activatePlacementMode(building) {
 	Menu.switchShadow(building);
-	building.view.off("click");
+	//building.view.off("click");
 
 	// change mouse behavior so building shadow follows cursor
 	$(document).off("click");
 	$(document).mousemove(function (event) {
-		building.view.css(Util.normalize(event));
+		//building.view.css(Util.normalize(event));
+
 	});
 
 

@@ -32,7 +32,7 @@
 			<div id = "other"></div>
 		</div>
 	</div>
-
+	<script src="http://mrdoob.github.com/three.js/build/three.min.js"></script>
  	<script src = "javascripts/jquery.js"></script>
 	<script src = "javascripts/Util.js"></script>
 	<script src = "javascripts/Entities.js"></script>
@@ -49,9 +49,22 @@
 	
 	<script src = "javascripts/hud.js"></script>
 	<script src = "javascripts/dynamics.js"></script>
+	<script src="javascripts/Environment.js"></script>
 	<script src = "javascripts/createObjects.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="javascripts/socket.js"></script>
+	<!-- <script src="javascripts/socket.js"></script> -->
+	<script>
+		var socket = {
+			emit: function () {}
+		};
+		function serialize(){}
+
+		var My = {};
+		My.TEAM = "civ1";
+		startCivs(My.TEAM);
+
+
+	</script>
 </body>
 
 

@@ -10,7 +10,7 @@ body{
     background-size: cover;
 }
 
-.factory, .base, .robot {
+/*.factory, .base, .robot {
 	position: absolute;
 	cursor: pointer;
 }
@@ -29,7 +29,7 @@ body{
 	position: absolute;
 	background-color: black;
 	/*background-size: 60px 60px;
-	background-position: -100px -50px;*/
+	background-position: -100px -50px;
 }
 .turret-cannon {
 	width: 5px;
@@ -79,7 +79,7 @@ body{
 	width: 40px;
 	height: 40px;
 	border-radius: 20px;
-	z-index: 3;/* below HUD, above buildings */
+	z-index: 3;
 }
 
 .missile {
@@ -107,7 +107,7 @@ body{
 	position: relative;
 	height: 7px;
 	top: -13px;
-}
+}*/
 
 /* Heads-up display */
 #hud-display {

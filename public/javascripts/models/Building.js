@@ -7,8 +7,9 @@ class Building extends Attackable {
 	constructor(team, position, initialHealth) {
 		super(team);
 		this.initialHealth = initialHealth || 100;
-		this.view.css(position);
-		this.view.css("filter", "brightness(50%)");
+		// this.view.css(position);
+		// this.view.css("filter", "brightness(50%)");
+		env.addBuilding(position);
 		this.status = "incomplete";
 	}
 
