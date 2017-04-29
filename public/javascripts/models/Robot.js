@@ -23,8 +23,8 @@ class Robot extends Attackable {
 		// }
 		// this.view.css(position);
 	 // 	this.addHealthBar(50);
-	 	env.addRobot(position);
-
+	 	this.view = env.addRobot(position); //the actual mess object
+	 	
 	 	if (team == My.TEAM) {
 		 	resources.robot ++;
 		 	resources.update();	
@@ -105,22 +105,23 @@ class Robot extends Attackable {
 
 	_go(callback) {
 		// _target may be an Entity or jQuery Position object
-		var target = ("view" in this._target) ? this._target.view.position() : this._target;
-		var position = this.view.position();
-		var distanceX = target.left - position.left;
-		var distanceY = target.top - position.top;
+		//var target =  ? this._target.view.position() : this._target;
+		var target =  Entities.isEntity(this._target)? this._target.position() : this._target;
+		var position = this.position();
+		var distanceX = target.x - position.x;
+	    var distanceY = target.y - position.y;
 		var distance = Util.distance(distanceX, distanceY);
 
-		if(distance < this._FUZZY){
-			// close enough, stop
-			this.cancel();
-			if (callback !== null) {
-				callback();
-			}
-			return;
-		}
+	 	if(distance < this._FUZZY){
+	 		// close enough, stop
+	 		this.cancel();
+	 		if (callback !== null) {
+	 			callback();
+	 		}
+	 		return;
+  		}
 
-		this.shift(distanceX * (this._SPEED/distance), distanceY * (this._SPEED/distance));
+	 	this.shift(distanceX * (this._SPEED/distance), distanceY * (this._SPEED/distance));
 		this._animation = requestAnimationFrame(this._go.bind(this, callback));
 	}
 
@@ -138,10 +139,16 @@ class Robot extends Attackable {
 		if (!soft) {
 			socket.emit('location', serializeLocation(this._id, deltaX, deltaY));
 		}
-		this.view.css({
-			left: this.view.position().left +  deltaX,
-			top: this.view.position().top + deltaY
-		});
+		var position = new THREE.Vector3();
+		vector.setFromMatrixPosition(this.view.matrixWorld);
+		var  newDeltas = Util.convertToVectorCoords(deltaX, deltaY);
+		this.view.position.setX(vector.x + newDeltas.x);
+		this.view.position.setY(vector.y + newDeltas.y);
+
+		// this.view.css({
+		// 	left: this.view.position().left +  deltaX,
+		// 	top: this.view.position().top + deltaY
+		// });
 	}
 
 	_continueAttacking() {

@@ -88,10 +88,26 @@ function goTo(event) {
 	if (!Entities.myRobot(selectedObject)) {
 		return;
 	}
-	var target = Util.project(event.clientX, event.clientY);
+	var target = env.selectMesh(event);
+	if(!target){ //if the floor mesh is selected
+		var target = Util.project(event.clientX, event.clientY); //if floor is selected find the coordinates point on the floor
+	}
 	selectedObject.go(target);
 };
+
+function selectMesh(event){
+	if(selectedObject){
+		goTo(event);
+	}else{
+		selectedObject =  env.selectMesh(event);
+
+	}
+
+}
+
+
+
 /**
  * Clicking the document directs the selected Robot to the point.
  */
-$(document).click(goTo);
+$(document).click(selectMesh);

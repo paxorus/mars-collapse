@@ -88,9 +88,9 @@ $("#hud-display").click(function (event) {
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
 	//var factory = new Factory(My.TEAM, Util.normalize(event));
-	var size = [10, 5, 5];
-	var point = env.project(event.pageX, event.pageY);
-	var factory = env.buildFactory(size, [point.x, point.y, 0], 0x00ff00);
+	var size = [15, 8, 8];
+	//var point = env.project(event.pageX, event.pageY);
+	var factory = env.addFactory(size, [event.pageX, event.pageY, 0], 0xff0000);
 	activatePlacementMode(factory);
 });
 

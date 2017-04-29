@@ -14,6 +14,13 @@ function Environment() {
 	document.body.appendChild(renderer.domElement);
 	animate();
 
+	this.getRenderer = function (){
+		return renderer;
+	};
+
+	this.getCamera = function (){
+		return camera;
+	};
 	this.addFloor = function () {
 		var planeGeo = new THREE.PlaneGeometry(200, 200, 20, 20);
 		var planeMat = new THREE.MeshBasicMaterial({color: 0x0088ff, overdraw: true});
@@ -61,6 +68,24 @@ function Environment() {
 		scene.add( factory );
 		return factory;
 	};
+
+	this.selectMesh = function (event){
+		var raycaster = new THREE.Raycaster(); // create once
+		var mouse = new THREE.Vector2(); // create once
+	
+		mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+		mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+
+		raycaster.setFromCamera( mouse, camera );
+
+		var intersects = raycaster.intersectObjects( scene.children );
+		if(intersects.length == 0){ //if no mesh is selected return
+			return;
+		}
+		
+		return Entities.get(intersects[0]); //pass the first object found 
+	
+	}
 
 	// start an event listener
 	this.listen = function (eventType, eventHandler) {

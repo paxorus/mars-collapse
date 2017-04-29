@@ -9,7 +9,7 @@ class Building extends Attackable {
 		this.initialHealth = initialHealth || 100;
 		// this.view.css(position);
 		// this.view.css("filter", "brightness(50%)");
-		env.addBuilding(position);
+		this.view = env.addBuilding(position);
 		this.status = "incomplete";
 	}
 

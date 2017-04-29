@@ -11,14 +11,16 @@ class EntitiesPrototype extends Array {
 		this._map = {};
 	}
 
-	get(jqueryObject) {
+	get(threeJsObject) {
 		// clicking accessories should select main object
-		while (!jqueryObject.parent().is("body")) {
-			jqueryObject = jqueryObject.parent();
-		}
-		var domElement = jqueryObject.get(0);
+		// while (!jqueryObject.parent().is("body")) {
+		// 	jqueryObject = jqueryObject.parent();
+		// }
+		var selectedMesh = threeJsObject.object;
+		//debugger
+		//var domElement = jqueryObject.get(0);
 		for (var i = 0; i < this.length; i ++) {
-			if (domElement == this[i].view.get(0)) {
+			if (selectedMesh == this[i].view) {
 				return this[i];
 			}
 		}
@@ -43,6 +45,10 @@ class EntitiesPrototype extends Array {
 
 	lookup(id) {
 		return this._map[id];
+	}
+
+	isEntity(x){
+		return x instanceof Entity;
 	}
 
 	isEnemy(x, y) {
