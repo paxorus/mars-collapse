@@ -15,19 +15,12 @@ class Robot extends Attackable {
 		this._timeout = null;
 		this._animation = null;
 
-		// this.view.addClass("robot");
-		// if (team == "civ1") {
-		// 	this.view.addClass("civ1-robot");
-		// } else {
-		// 	this.view.addClass("civ2-robot");
-		// }
-		// this.view.css(position);
-	 // 	this.addHealthBar(50);
-	 	this.view = env.addRobot(position); //the actual mess object
+	 	// this.addHealthBar(50);
+	 	this.view = env.addRobot(position, team);
 	 	
 	 	if (team == My.TEAM) {
 		 	resources.robot ++;
-		 	resources.update();	
+		 	resources.update();
 	 	}
  	}
 

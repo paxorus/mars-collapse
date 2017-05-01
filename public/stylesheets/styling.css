@@ -6,7 +6,8 @@ body{
 	margin: 0;
     background-color: rgb(214, 113, 12);
     height: 740px;
-    background-image: url('https://s-media-cache-ak0.pinimg.com/originals/bd/7e/57/bd7e575a80a12958ed625157327ffbfa.jpg');
+    overflow: hidden;
+    background-image: url('../images/aridonis.jpg');
     background-size: cover;
 }
 

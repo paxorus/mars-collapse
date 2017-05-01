@@ -4,7 +4,6 @@
  * @author Prakhar
  */
 
-var selectedObject = null;// the last clicked object
 
 /**
  * On right-click, deselect the object.
@@ -45,7 +44,6 @@ function onEntityClick(event) {
 	} else {
 		selectEntity(entity);
 	}
-
 }
 
 function selectEntity(entity) {
@@ -95,19 +93,19 @@ function goTo(event) {
 	selectedObject.go(target);
 };
 
-function selectMesh(event){
-	if(selectedObject){
-		goTo(event);
-	}else{
-		selectedObject =  env.selectMesh(event);
+// function selectMesh(event){
+// 	if(selectedObject){
+// 		goTo(event);
+// 	}else{
+// 		selectedObject =  env.selectMesh(event);
 
-	}
+// 	}
 
-}
+// }
 
 
 
 /**
  * Clicking the document directs the selected Robot to the point.
  */
-$(document).click(selectMesh);
+// $(document).click(selectMesh);

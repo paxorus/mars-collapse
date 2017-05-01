@@ -1,17 +1,23 @@
-var floor;
+/**
+ *
+ * @author Jasmine
+ */
+
 function Environment() {
 
 	var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-	//camera = new THREE.OrthographicCamera(window.innerWidth / - 5, window.innerWidth / 5, window.innerHeight / 2, window.innerHeight / - 2, - 500, 1000 );
-	camera.position.y = 200;
-	camera.position.z = 200;
-	camera.rotation.x = -45 * Math.PI / 180;
+	camera.position.y = 90;
+	camera.position.z = 90;
+	camera.rotation.x = -5/16 * Math.PI;
 
-	var scene = new THREE.Scene();//a list of objects that affect what is displayed on the screen, such as 3D models and lights.
+	var scene = new THREE.Scene();
 
 	var renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
+
+	var listeners = [];
+	var floor = addFloor();
 	animate();
 
 	this.getRenderer = function (){
@@ -21,20 +27,19 @@ function Environment() {
 	this.getCamera = function (){
 		return camera;
 	};
-	this.addFloor = function () {
-		var planeGeo = new THREE.PlaneGeometry(200, 200, 20, 20);
-		var planeMat = new THREE.MeshBasicMaterial({color: 0x0088ff, overdraw: true});
-		var mesh = new THREE.Mesh(planeGeo, planeMat);
-		mesh.rotation.x = - Math.PI / 2;
-		// mesh.rotation.y = Math.PI / 4;
-		scene.add(mesh);
-		return mesh;
+
+	function addFloor() {
+		var planeGeo = new THREE.PlaneGeometry(500, 500, 20, 20);
+		var floor = new THREE.Mesh(planeGeo, Textures.floor);
+		floor.rotation.x = - Math.PI / 2;
+		scene.add(floor);
+		return floor;
 	};
 
 	
-	this.addRobot = function(position) {
-		var sphereGeo = new THREE.SphereGeometry(8, 20, 20);
-		var sphereMat = new THREE.MeshBasicMaterial({color: 'pink'});
+	this.addRobot = function(position, team) {
+		var sphereGeo = new THREE.SphereGeometry(3, 20, 20);
+		var sphereMat = (team == "civ1") ? Textures.eskie : Textures.beagle;
 		var sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
 		sphereMesh.position.y = 4;
 		scene.add(sphereMesh);
@@ -44,18 +49,17 @@ function Environment() {
 		return sphereMesh;
 	}
 
-	this.addBuilding = function(position) {
+	this.addBase = function(position, team) {
 		var geometry = new THREE.BoxGeometry( 20, 10, 10 );
-		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-		var cube = new THREE.Mesh( geometry, material );
-		scene.add( cube );
+		var material = (team == "civ1") ? Textures.base1 : Textures.base2;
+
+		var cube = new THREE.Mesh(geometry, material);
+		scene.add(cube);
 
 		cube.position.x = position.left;
 		cube.position.z = position.top;
 		return cube;
 	}
-
-	/**new added**/
 
 	this.addFactory = function (size, position, color) {
 		// color = color || 0x444444;
@@ -65,7 +69,7 @@ function Environment() {
 		
 
 		factory.position.set(position[0], position[1], position[2]);
-		scene.add( factory );
+		scene.add(factory);
 		return factory;
 	};
 
@@ -83,6 +87,7 @@ function Environment() {
 			return;
 		}
 		
+		console.log(intersects);
 		return Entities.get(intersects[0]); //pass the first object found 
 	
 	}
@@ -100,14 +105,27 @@ function Environment() {
 		});
 	};
 
-	/**new added**/
-
 	function animate() {
 		renderer.render(scene, camera);
-		//camera.rotation.y = Date.now() * 0.00005;
-
+		// camera.rotation.y = Date.now() * 0.00005;
 		requestAnimationFrame(animate);
 	}
 
-	floor = this.addFloor();
+
+	this.selectedMesh = null;// the last clicked object
+
+	this.listen("click", function (event) {
+		console.log("here");
+		env.selectMesh(event);
+	});
+
+	this.listen("contextmenu", function (event) {
+		if(selectedObject){
+			selectedObject.view.css("opacity", 1);
+			selectedObject = null;
+			Profile.clear();
+		}
+		event.preventDefault();
+	});
 }
+

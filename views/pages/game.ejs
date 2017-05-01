@@ -32,15 +32,17 @@
 			<div id = "other"></div>
 		</div>
 	</div>
-	<script src="http://mrdoob.github.com/three.js/build/three.min.js"></script>
- 	<script src = "javascripts/jquery.js"></script>
+	<script src = "/socket.io/socket.io.js"></script>
+	<script src = "javascripts/lib/three.js"></script>
+ 	<script src = "javascripts/lib/jquery.js"></script>
+
 	<script src = "javascripts/Util.js"></script>
 	<script src = "javascripts/Entities.js"></script>
 	<script src = "javascripts/RobotAI.js"></script>
+	<script src = "javascripts/Textures.js"></script>
 
 	<script src = "javascripts/models/Entity.js"></script>
 	<script src = "javascripts/models/Building.js"></script>
-
 	<script src = "javascripts/models/CivBase.js"></script>
 	<script src = "javascripts/models/Factory.js"></script>
 	<script src = "javascripts/models/Mine.js"></script>
@@ -48,22 +50,25 @@
 	<script src = "javascripts/models/Turret.js"></script>
 	
 	<script src = "javascripts/hud.js"></script>
-	<script src = "javascripts/dynamics.js"></script>
-	<script src="javascripts/Environment.js"></script>
+	<script src = "javascripts/Environment.js"></script>
 	<script src = "javascripts/createObjects.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
+	<script src = "javascripts/dynamics.js"></script>
 	<!-- <script src="javascripts/socket.js"></script> -->
 	<script>
+		// spoof for socket.js
 		var socket = {
 			emit: function () {}
 		};
 		function serialize(){}
+		function serializeLocation(){}
 
 		var My = {};
+		var env = new Environment();
+		
 		My.TEAM = "civ1";
 		startCivs(My.TEAM);
-
-
+		My.TEAM = "civ2";
+		startCivs(My.TEAM);
 	</script>
 </body>
 

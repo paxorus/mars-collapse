@@ -5,8 +5,8 @@
  */
 
 var NUM_MINES = 10;
-var NUM_ROBOTS = 3;
-var env;
+var NUM_ROBOTS = 4;
+
 var resources = {
 	metal: 1000,
 	robot: 0,
@@ -32,29 +32,27 @@ var resources = {
 };
 
 function startCivs(civ) {
-	env = new Environment();
 	// collaboratively generate the map
 	// for (var i = 0; i < NUM_MINES / 2; i++) {
 	// 	var mine = new Mine(Util.pick(50, 60));
 	// 	Entities.push(mine);
-	// 	socket.emit('create', serialize(mine));
+	// 	// socket.emit('create', serialize(mine));
 	// }
 
 	// create your own civilization
-	var baseTop = (My.TEAM == 'civ1') ? 90 : 40;
-	var base = new CivBase(My.TEAM, {top: baseTop, left: 50});
+	var baseTop = (My.TEAM == 'civ1') ? 80 : -80;
+	var base = new CivBase(My.TEAM, {top: baseTop, left: 0});
 	base.quickstart();
 	Entities.push(base);
 
 	for(var i = 0; i < NUM_ROBOTS; i++){
 		var position = {
-			left: Util.pick(-80, 80),
-			top: (My.TEAM == 'civ1') ? 80 : -80
+			left: Util.pick(-30, 30),
+			top: (My.TEAM == 'civ1') ? 70 : -70
 		};
 		Entities.push(new Robot(My.TEAM, position));
 	}
 	
- 
 	resources.update();
 	Menu.display();
 }

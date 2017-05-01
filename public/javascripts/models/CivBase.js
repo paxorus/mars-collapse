@@ -8,13 +8,7 @@ class CivBase extends Building {
 	constructor(team, position) {
 		super(team, position, 200);
 		this.type = "CivBase";
-
-		// this.view.addClass("base");
-		// if (team == "civ1") {
-		// 	this.view.addClass("civ1-base");
-		// } else {
-		// 	this.view.addClass("civ2-base");
-		// }
+		this.view = env.addBase(position, team);
 	}
 
 	static get cost() {
