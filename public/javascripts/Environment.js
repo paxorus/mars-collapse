@@ -17,6 +17,7 @@ function Environment() {
 	document.body.appendChild(renderer.domElement);
 
 	var listeners = [];
+	this.selectedObject = null;// the last clicked object
 	var floor = addFloor();
 	animate();
 
@@ -36,7 +37,6 @@ function Environment() {
 		return floor;
 	};
 
-	
 	this.addRobot = function(position, team) {
 		var sphereGeo = new THREE.SphereGeometry(3, 20, 20);
 		var sphereMat = (team == "civ1") ? Textures.eskie : Textures.beagle;
@@ -73,24 +73,30 @@ function Environment() {
 		return factory;
 	};
 
-	this.selectMesh = function (event){
-		var raycaster = new THREE.Raycaster(); // create once
-		var mouse = new THREE.Vector2(); // create once
+	this.unproject = function (x, y) {
+		var raycaster = new THREE.Raycaster();// create once
+		var mouse = new THREE.Vector2();// create once
 	
-		mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
-		mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+		mouse.x = ( x / renderer.domElement.clientWidth ) * 2 - 1;
+		mouse.y = - ( y / renderer.domElement.clientHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( mouse, camera );
 
-		var intersects = raycaster.intersectObjects( scene.children );
-		if(intersects.length == 0){ //if no mesh is selected return
-			return;
+		var intersects = raycaster.intersectObjects(scene.children);
+		if (intersects.length == 0) {
+			return null;
 		}
-		
-		console.log(intersects);
-		return Entities.get(intersects[0]); //pass the first object found 
-	
-	}
+		return intersects[0];
+		// return Entities.get(intersects[0]);
+	};
+
+	this.isFloor = function (mesh) {
+		return mesh == floor;
+	};
+
+	this.highlight = function () {
+
+	};
 
 	// start an event listener
 	this.listen = function (eventType, eventHandler) {
@@ -110,22 +116,5 @@ function Environment() {
 		// camera.rotation.y = Date.now() * 0.00005;
 		requestAnimationFrame(animate);
 	}
-
-
-	this.selectedMesh = null;// the last clicked object
-
-	this.listen("click", function (event) {
-		console.log("here");
-		env.selectMesh(event);
-	});
-
-	this.listen("contextmenu", function (event) {
-		if(selectedObject){
-			selectedObject.view.css("opacity", 1);
-			selectedObject = null;
-			Profile.clear();
-		}
-		event.preventDefault();
-	});
 }
 

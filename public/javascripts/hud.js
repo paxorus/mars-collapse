@@ -5,7 +5,7 @@
  */
 var Profile = {
 	update: function (entity, color) {
-		if (entity == selectedObject) {
+		if (entity == env.selectedObject) {
 			$("#hud-bar").width(100 * entity.health / entity.initialHealth);
 			$("#hud-bar").css("background-color", color);
 			$("#health-status").text(entity.health + "/" + entity.initialHealth);
@@ -13,14 +13,15 @@ var Profile = {
 	},
 
 	display: function (entity) {
-		var backImage = entity.view.css("background-image");
+		var backImage = entity.view.material.map.image;
 		if (backImage) {
-			$("#thumbnail").css("background-image", backImage);
+			var url = "url(" + backImage.src + ")";
+			$("#thumbnail").css("background-image", url);
 		}
 
-		$("#hud-bar").width(100 * entity.health / entity.initialHealth);
-		$("#hud-bar").css("background-color", entity.healthBar.css("background-color"));
-		$("#health-status").text(entity.health + "/" + entity.initialHealth);
+		// $("#hud-bar").width(100 * entity.health / entity.initialHealth);
+		// $("#hud-bar").css("background-color", entity.healthBar.css("background-color"));
+		// $("#health-status").text(entity.health + "/" + entity.initialHealth);
 		$("#type").text(entity.team + " " + entity.type);
 		$("#other").text("");
 		Menu.display(entity);
@@ -112,7 +113,7 @@ $("#build-greenhouse").click(function () {
 $("#build-robot").click(function (event) {
 	event.stopPropagation();
 	resources.pay(Robot.cost);
-	selectedObject.produceRobot();
+	env.selectedObject.produceRobot();
 });
 
 
@@ -145,10 +146,10 @@ function goAndBuild(building) {
 	building.view.click(onEntityClick);
 	building.start();
 
-	if (!Entities.myRobot(selectedObject)) {
+	if (!Entities.myRobot(env.selectedObject)) {
 		return;
 	}
-	var robot = selectedObject;
+	var robot = env.selectedObject;
 	var target = Util.project(event.clientX, event.clientY);
 	robot.build(building, target);
 }

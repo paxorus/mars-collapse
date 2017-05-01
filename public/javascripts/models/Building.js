@@ -40,7 +40,7 @@ class Building extends Attackable {
 
 	finish() {
 		this.view.css("filter", "none");
-		if (this == selectedObject) {
+		if (this == env.selectedObject) {
 			$("#other").text("complete");
 		}
 	}

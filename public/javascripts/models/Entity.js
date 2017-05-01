@@ -19,27 +19,27 @@ class Entity {
 		// this.view.click(onEntityClick);
 		// $(document.body).append(this.view);
 	}
-	position(){ //gets the position of an object on the scene
-		var vector = new THREE.Vector3();
-		var renderer = env.getRenderer();
-		var camera = env.getCamera();
+	// position(){ //gets the position of an object on the scene
+	// 	var vector = new THREE.Vector3();
+	// 	var renderer = env.getRenderer();
+	// 	var camera = env.getCamera();
 
-		var widthHalf = 0.5*renderer.context.canvas.width;
-		var heightHalf = 0.5*renderer.context.canvas.height;
+	// 	var widthHalf = 0.5*renderer.context.canvas.width;
+	// 	var heightHalf = 0.5*renderer.context.canvas.height;
 
-		this.view.updateMatrixWorld();
-		vector.setFromMatrixPosition(this.view.matrixWorld);
-		vector.project(camera);
+	// 	this.view.updateMatrixWorld();
+	// 	vector.setFromMatrixPosition(this.view.matrixWorld);
+	// 	vector.project(camera);
 
-		vector.x = ( vector.x * widthHalf ) + widthHalf;
-    	vector.y = - ( vector.y * heightHalf ) + heightHalf;
+	// 	vector.x = ( vector.x * widthHalf ) + widthHalf;
+ //    	vector.y = - ( vector.y * heightHalf ) + heightHalf;
 		
-		return { 
-      		x: vector.x,
-        	y: vector.y
-    	};
+	// 	return { 
+ //      		x: vector.x,
+ //        	y: vector.y
+ //    	};
 
-	}	
+	// }	
 
 	isDead() {
 		return !this.isAlive;
@@ -49,8 +49,8 @@ class Entity {
 		// die() will only run once
 		this.view.remove();
 		Entities.remove(this);
-		if (this == selectedObject) {
-			selectedObject = null;
+		if (this == env.selectedObject) {
+			env.selectedObject = null;
 			Profile.clear();
 		}
 	}

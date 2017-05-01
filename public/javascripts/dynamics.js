@@ -8,24 +8,25 @@
 /**
  * On right-click, deselect the object.
  */
-$(document).contextmenu(function (event) {
-	if(selectedObject){
-		selectedObject.view.css("opacity", 1);
-		selectedObject = null;
+function deselectObject(event) {
+	if (env.selectedObject) {
+		env.selectedObject.view.material.opacity = 1;
+		env.selectedObject = null;
 		Profile.clear();
 	}
 	event.preventDefault();
-});
+}
 
 /**
  * Have a Robot interact with an Entity or select the clicked Entity.
  */
-function onEntityClick(event) {
-	event.stopPropagation();// click should not propagate to document
+function onEntityClick(hit) {
 
-	var entity = Entities.get($(event.target));
-	var isMyRobot = Entities.myRobot(selectedObject);
-	var coordinates = Util.project(event.clientX, event.clientY);
+	var mesh = hit.object;
+	var entity = Entities.get(mesh);
+	var isMyRobot = Entities.myRobot(env.selectedObject);
+	var coordinates = hit.point;
+	// var coordinates = Util.project(event.clientX, event.clientY);
 
 	if (!isMyRobot) {
 		selectEntity(entity);
@@ -33,7 +34,7 @@ function onEntityClick(event) {
 	}
 
 	// robot is active, direct it to interact with the clicked object if possible
-	var robot = selectedObject;
+	var robot = env.selectedObject;
 
 	if (Entities.isEnemy(robot, entity)) {
 		declareWar(robot, entity);
@@ -47,12 +48,16 @@ function onEntityClick(event) {
 }
 
 function selectEntity(entity) {
-	if (selectedObject) {
-		selectedObject.view.css("opacity", 1);
+	if (env.selectedObject) {
+		env.selectedObject.view.material.opacity = 1;
 	}
-	entity.view.css("opacity", 0.75);
+
+	var material = entity.view.material.clone();
+	material.transparent = true;
+	material.opacity = 0.75;
+	entity.view.material = material;
 	entity.display();
-	selectedObject = entity;
+	env.selectedObject = entity;
 }
 
 
@@ -82,30 +87,8 @@ function declareWar(robot, enemyObject) {
 /**
  * Move the player to the designated location on the map.
  */
-function goTo(event) {
-	if (!Entities.myRobot(selectedObject)) {
-		return;
-	}
-	var target = env.selectMesh(event);
-	if(!target){ //if the floor mesh is selected
-		var target = Util.project(event.clientX, event.clientY); //if floor is selected find the coordinates point on the floor
-	}
-	selectedObject.go(target);
+function goTo(hit) {
+	if (Entities.myRobot(env.selectedObject)) {
+		env.selectedObject.go(hit.point);
+	}	
 };
-
-// function selectMesh(event){
-// 	if(selectedObject){
-// 		goTo(event);
-// 	}else{
-// 		selectedObject =  env.selectMesh(event);
-
-// 	}
-
-// }
-
-
-
-/**
- * Clicking the document directs the selected Robot to the point.
- */
-// $(document).click(selectMesh);

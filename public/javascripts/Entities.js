@@ -11,16 +11,13 @@ class EntitiesPrototype extends Array {
 		this._map = {};
 	}
 
-	get(threeJsObject) {
+	get(mesh) {
 		// clicking accessories should select main object
 		// while (!jqueryObject.parent().is("body")) {
 		// 	jqueryObject = jqueryObject.parent();
 		// }
-		var selectedMesh = threeJsObject.object;
-		//debugger
-		//var domElement = jqueryObject.get(0);
 		for (var i = 0; i < this.length; i ++) {
-			if (selectedMesh == this[i].view) {
+			if (mesh == this[i].view) {
 				return this[i];
 			}
 		}
@@ -47,7 +44,7 @@ class EntitiesPrototype extends Array {
 		return this._map[id];
 	}
 
-	isEntity(x){
+	isEntity(x) {
 		return x instanceof Entity;
 	}
 
@@ -65,11 +62,12 @@ class EntitiesPrototype extends Array {
 	}
 
 	distance(player, entity) {
-		var playerX = (player.view.position().left + player.view.width() / 2);
-		var playerY = (player.view.position().top + player.view.height() / 2);
-		var entityX = (entity.view.position().left + entity.view.width() / 2);
-		var entityY = (entity.view.position().top + entity.view.height() / 2);
-		return Util.distance(entityX - playerX, entityY - playerY);
+		var robotRadius = player.view.geometry.boundingSphere.radius;
+		var playerX = (player.view.position.x + robotRadius);
+		var playerZ = (player.view.position.z + robotRadius);
+		var entityX = (entity.view.position.x + 0 / 2);
+		var entityZ = (entity.view.position.z + 0 / 2);// entity.view.height() 
+		return Util.distance(entityX - playerX, entityZ - playerZ);
 	}
 };
 var Entities = new EntitiesPrototype();

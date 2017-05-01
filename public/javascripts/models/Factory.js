@@ -16,7 +16,7 @@ class Factory extends Building {
 
 	finish() {
 		super.finish();
-		if (this == selectedObject) {
+		if (this == env.selectedObject) {
 			Menu.display(this);
 		}
 	}

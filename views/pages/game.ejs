@@ -69,6 +69,20 @@
 		startCivs(My.TEAM);
 		My.TEAM = "civ2";
 		startCivs(My.TEAM);
+
+		env.listen("click", function (event) {
+			event.stopPropagation();
+			var hit = env.unproject(event.clientX, event.clientY);
+			var mesh = hit.object;
+			if (env.isFloor(mesh)) {
+				goTo(hit);
+			} else {
+				onEntityClick(hit);
+			}
+		});
+
+		env.listen("contextmenu", deselectObject);
+
 	</script>
 </body>
 

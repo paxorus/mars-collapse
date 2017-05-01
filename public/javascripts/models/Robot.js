@@ -9,8 +9,8 @@ class Robot extends Attackable {
 		super(team);
 		this.type = "Robot";
 		this.role = null;
-		this._SPEED = 3;
-		this._FUZZY = 45;
+		this._SPEED = 2;
+		this._FUZZY = 10;
 		this._target = null;
 		this._timeout = null;
 		this._animation = null;
@@ -97,13 +97,12 @@ class Robot extends Attackable {
 	}
 
 	_go(callback) {
-		// _target may be an Entity or jQuery Position object
-		//var target =  ? this._target.view.position() : this._target;
-		var target =  Entities.isEntity(this._target)? this._target.position() : this._target;
-		var position = this.position();
+		// _target may be an Entity or XYZ object
+		var target = Entities.isEntity(this._target) ? this._target.view.position : this._target;
+		var position = this.view.position;
 		var distanceX = target.x - position.x;
-	    var distanceY = target.y - position.y;
-		var distance = Util.distance(distanceX, distanceY);
+	    var distanceZ = target.z - position.z;
+		var distance = Util.distance(distanceX, distanceZ);
 
 	 	if(distance < this._FUZZY){
 	 		// close enough, stop
@@ -113,8 +112,8 @@ class Robot extends Attackable {
 	 		}
 	 		return;
   		}
-
-	 	this.shift(distanceX * (this._SPEED/distance), distanceY * (this._SPEED/distance));
+  		// console.log
+	 	this.shift(distanceX * (this._SPEED/distance), distanceZ * (this._SPEED/distance));
 		this._animation = requestAnimationFrame(this._go.bind(this, callback));
 	}
 
@@ -128,20 +127,14 @@ class Robot extends Attackable {
 		this._timeout = setTimeout(this._mine.bind(this), 1000);
 	}
 	
-	shift(deltaX, deltaY, soft) {
+	shift(deltaX, deltaZ, soft) {
 		if (!soft) {
-			socket.emit('location', serializeLocation(this._id, deltaX, deltaY));
+			socket.emit('location', serializeLocation(this._id, deltaX, deltaZ));
 		}
-		var position = new THREE.Vector3();
-		vector.setFromMatrixPosition(this.view.matrixWorld);
-		var  newDeltas = Util.convertToVectorCoords(deltaX, deltaY);
-		this.view.position.setX(vector.x + newDeltas.x);
-		this.view.position.setY(vector.y + newDeltas.y);
 
-		// this.view.css({
-		// 	left: this.view.position().left +  deltaX,
-		// 	top: this.view.position().top + deltaY
-		// });
+		this.view.position.x += deltaX;
+		// console.log(deltaZ);
+		this.view.position.z += deltaZ;
 	}
 
 	_continueAttacking() {
@@ -182,14 +175,14 @@ class Robot extends Attackable {
 
 	changeRole(role) {
 		this.role = role;
-		if (selectedObject == this) {
+		if (env.selectedObject == this) {
 			this.display();
 		}
 	}
 
 	display() {
 		super.display();
-		if (selectedObject == this && this.role !== null) {
+		if (env.selectedObject == this && this.role !== null) {
 			$("#other").text(this.role);
 		}
 	}
