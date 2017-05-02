@@ -53,11 +53,31 @@
 	<script src = "javascripts/Environment.js"></script>
 	<script src = "javascripts/createObjects.js"></script>
 	<script src = "javascripts/dynamics.js"></script>
-	<script src="javascripts/socket.js"></script>
+	<!-- <script src="javascripts/socket.js"></script> -->
 	<script>
+		// spoof for socket.js
+		var socket = {
+			emit: function () {}
+		};
+		function serialize(){}
+		function serializeLocation(){}
+		function serializeHealth(){}
+		function serializeMine(){}
+		function serializeStatus(){}
+		function serializeBuild(){}
+
+		var My = {};
 		var env = new Environment();
+		
+		My.TEAM = "civ1";
+		startCivs(My.TEAM);
+		My.TEAM = "civ2";
+		startCivs(My.TEAM);
+
 		env.listen("click", handleClick);
+
 		env.listen("contextmenu", deselectObject);
+
 	</script>
 </body>
 

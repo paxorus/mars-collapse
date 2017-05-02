@@ -3,6 +3,7 @@
  *
  * @author Tristan, Prakhar
  */
+
 var My = {};
 var socket = io("/game");
 socket.emit('entry', sessionStorage.entryToken);
@@ -19,7 +20,7 @@ function serialize(entity) {
 	var data = {
 		type: entity.type,
 		team: entity.team,
-		position: entity.view.position(),
+		position: entity.view.position,
 		id: entity._id
 	};
 	if (entity instanceof Mine) {
