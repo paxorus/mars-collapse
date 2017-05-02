@@ -26,7 +26,7 @@ class Entity {
 
 	die() {
 		// die() will only run once
-		this.view.remove();
+		env.remove(this.view);
 		Entities.remove(this);
 		if (this == env.selectedObject) {
 			env.selectedObject = null;

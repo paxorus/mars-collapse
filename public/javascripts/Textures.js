@@ -33,7 +33,7 @@ var Textures = {
 };
 
 (function () {
-	Textures.default(["floor", "eskie", "beagle", "base1", "base2", "factory"]);
+	Textures.default(["floor", "eskie", "beagle", "base1", "base2", "factory", "mine"]);
 	Textures.shadow(["base1", "base2", "factory"]);
 	var loader = new THREE.TextureLoader();
 
@@ -54,5 +54,8 @@ var Textures = {
 	});
 	loader.load('images/factory.jpg', function (texture) {
 		Textures.bind("factory", texture);
+	});
+	loader.load('images/metal_icon.png', function (texture) {
+		Textures.bind("mine", texture);
 	});
 })();

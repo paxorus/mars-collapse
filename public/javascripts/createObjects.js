@@ -33,11 +33,15 @@ var resources = {
 
 function startCivs(civ) {
 	// collaboratively generate the map
-	// for (var i = 0; i < NUM_MINES / 2; i++) {
-	// 	var mine = new Mine(Util.pick(50, 60));
-	// 	Entities.push(mine);
-	// 	// socket.emit('create', serialize(mine));
-	// }
+	for (var i = 0; i < NUM_MINES / 2; i++) {
+		var position = {
+			x: Util.pick(-100, 100),
+			z: Util.pick(-100, 100)
+		}
+		var mine = new Mine(Util.pick(30, 60), position);
+		Entities.push(mine);
+		// socket.emit('create', serialize(mine));
+	}
 
 	// create your own civilization
 	var baseTop = (My.TEAM == 'civ1') ? 80 : -80;

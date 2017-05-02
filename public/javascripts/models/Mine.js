@@ -3,15 +3,13 @@
  */
 
 class Mine extends Entity {
-	constructor(num) {
+	constructor(num, position) {
 		super();
 		this.team = "";
 		this.type = "Mine";
-		this.view.addClass("mine");
-		this.addHealthBar(num);
-		this.view.css("top", Util.pick(70, window.innerHeight - 95));
-		this.view.css("left", Util.pick(70, window.innerWidth - 95));
-		this.healthBar.css("display", "none");
+		// this.addHealthBar(num);
+		this.view = env.addMine(position, num);
+		// this.healthBar.css("display", "none");
 	}
 
 	mining(deltaProgress, soft) {
@@ -23,7 +21,7 @@ class Mine extends Entity {
 
 		deltaProgress = Math.min(deltaProgress, this.health);
 		super.applyHealth(-deltaProgress, true);
-		this.healthBar.css("display", "block");
+		// this.healthBar.css("display", "block");
 	}
 
 	hasMinerals() {

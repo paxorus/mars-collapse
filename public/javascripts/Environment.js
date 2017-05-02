@@ -37,19 +37,17 @@ function Environment() {
 		return floor;
 	};
 
-	this.addRobot = function(position, team) {
-		var sphereGeo = new THREE.SphereGeometry(3, 20, 20);
+	this.addRobot = function (position, team) {
+		var sphereGeo = new THREE.SphereGeometry(4, 20, 20);
 		var sphereMat = (team == "civ1") ? Textures.eskie : Textures.beagle;
 		var sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
 		scene.add(sphereMesh);
 
-		sphereMesh.position.x = position.x;
-		sphereMesh.position.y = 4;
-		sphereMesh.position.z = position.z;
+		sphereMesh.position.set(position.x, 4, position.z);
 		return sphereMesh;
 	}
 
-	this.addBase = function(position, team) {
+	this.addBase = function (position, team) {
 		var geometry = new THREE.BoxGeometry( 20, 10, 10 );
 		var material = (team == "civ1") ? Textures.base1 : Textures.base2;
 		var cube = new THREE.Mesh(geometry, material);
@@ -58,6 +56,20 @@ function Environment() {
 
 		return cube;
 	}
+
+	this.addMine = function (position, num) {
+		// var geo = new THREE.BoxGeometry(5, 5, 5);
+		var geo = new THREE.SphereGeometry(3, 32, 32, 0, Math.PI);
+		var mesh = new THREE.Mesh(geo, Textures.mine);
+		mesh.material.color = {r: 0.96, g: 0.58, b: 0.26};// strong orange
+		mesh.position.set(position.x, -1, position.z);
+		mesh.rotation.x = -Math.PI / 2;
+		num /= 30;
+		mesh.scale.set(num, num, num);
+		scene.add(mesh);
+
+		return mesh;
+	};
 
 	this.addFactory = function (position) {
 		var geo = new THREE.BoxGeometry(20, 10, 10);
@@ -136,6 +148,10 @@ function Environment() {
 
 	this.isFloor = function (mesh) {
 		return mesh == floor;
+	};
+
+	this.remove = function (mesh) {
+		scene.remove(mesh);
 	};
 
 	// start an event listener
