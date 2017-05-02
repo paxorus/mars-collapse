@@ -66,11 +66,51 @@ function Environment() {
 		var geo = new THREE.BoxGeometry( size[0], size[1], size[2] );
 		var material = new THREE.MeshBasicMaterial( {color: color} );
 		var factory = new THREE.Mesh( geo, material );
-		
-
-		factory.position.set(position[0], position[1], position[2]);
 		scene.add(factory);
+
+		//factory.position.set(position[0], position[1], position[2]);
+		factory.position.x = position[0];
+		factory.position.z = position[1];
+		
 		return factory;
+	};
+
+	this.addTurretCannon = function(){
+		var geometry2 = new THREE.BoxGeometry(8,1,1);
+		var material2 = new THREE.MeshBasicMaterial( {color: 0xffffff });
+		var turretCannon = new THREE.Mesh(geometry2, material2);
+		turretCannon.position.y = 5
+		return turretCannon;
+
+	}
+
+	this.addTurret = function (position, color){
+		var geometry1 = new THREE.BoxGeometry(14, 7, 7);
+		var material1 = new THREE.MeshBasicMaterial( {color: color} );
+		var turret = new THREE.Mesh(geometry1, material1);
+		turret.position.x = 0;
+		turret.position.z = 0;
+		return turret;
+	}
+
+	this.appendObjects = function(object1, object2){
+		object1.add(object2);
+		scene.add(object1);
+	}
+
+	this.removeObject = function(object){
+		scene.remove(object);
+
+	};
+
+	this.addMissile = function (position){
+		var geometry = new THREE.SphereGeometry(3, 5, 5);
+		var material = new THREE.MeshBasicMaterial({color: 0x000000});
+		var missile = new THREE.Mesh(geometry,material);
+		scene.add(missile);
+		missile.position.x = position[0];
+		missile.position.z = position[1];
+		return missile
 	};
 
 	this.unproject = function (x, y) {
@@ -115,6 +155,6 @@ function Environment() {
 		renderer.render(scene, camera);
 		// camera.rotation.y = Date.now() * 0.00005;
 		requestAnimationFrame(animate);
-	}
+	};
 }
 

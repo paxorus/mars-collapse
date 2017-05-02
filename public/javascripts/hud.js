@@ -91,7 +91,7 @@ $("#build-factory").click(function (event) {
 	//var factory = new Factory(My.TEAM, Util.normalize(event));
 	var size = [15, 8, 8];
 	//var point = env.project(event.pageX, event.pageY);
-	var factory = env.addFactory(size, [event.pageX, event.pageY, 0], 0xff0000);
+	//var factory = env.addFactory(size, [event.pageX, event.pageY, 0], 0xff0000);
 	activatePlacementMode(factory);
 });
 
@@ -103,8 +103,10 @@ $("#build-base").click(function (event) {
 
 $("#build-turret").click(function (event) {
 	event.stopPropagation();
+	// var turret = new Turret(My.TEAM, Util.normalize(event));
 	var turret = new Turret(My.TEAM, Util.normalize(event));
-	activatePlacementMode(turret);
+	//activatePlacementMode(turret);
+	turret.activateRadar();
 });
 
 $("#build-greenhouse").click(function () {
@@ -118,12 +120,13 @@ $("#build-robot").click(function (event) {
 
 
 function activatePlacementMode(building) {
-	Menu.switchShadow(building);
+	//Menu.switchShadow(building);
 	//building.view.off("click");
 
 	// change mouse behavior so building shadow follows cursor
 	$(document).off("click");
 	$(document).mousemove(function (event) {
+		
 		//building.view.css(Util.normalize(event));
 
 	});
