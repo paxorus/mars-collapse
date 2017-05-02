@@ -3,19 +3,38 @@
  */
 
 var Textures = {
-	floor: new THREE.MeshBasicMaterial({color: 0x0088ff}),
-	eskie: new THREE.MeshBasicMaterial({color: 0x0088ff}),
-	beagle: new THREE.MeshBasicMaterial({color: 0x0088ff}),
-	base1: new THREE.MeshBasicMaterial({color: 0x0088ff}),
-	base2: new THREE.MeshBasicMaterial({color: 0x0088ff}),
-	update: function (name, texture) {
+	default: function (names) {
+		names.forEach(function (name) {
+			Textures[name] = new THREE.MeshBasicMaterial({color: 0x0088ff});
+		});
+	},
+	shadow: function (names) {
+		var shadowNames = names.map(function (x) {
+			return x + "Shadow";
+		});
+		this.default(shadowNames);
+		names.forEach(function (name) {
+			Textures[name].shadow = Textures[name + "Shadow"];
+			Textures[name + "Shadow"].shadow = Textures[name];
+		});
+	},
+	update: function (name, texture, color) {
 		this[name].map = texture;
-		this[name].color = {b: 1, g: 1, r: 1};
+		this[name].color = color || {r: 1, g: 1, b: 1};
 		this[name].needsUpdate = true;
+	},
+	bind: function (name, texture) {
+		var shadowName = name + "Shadow";
+		Textures.update(name, texture);// fully lit
+		if (this[name].shadow) {
+			Textures.update(shadowName, texture, {r: 0.3, g: 0.3, b: 0.3});// dark
+		}
 	}
 };
 
-setTimeout(function () {
+(function () {
+	Textures.default(["floor", "eskie", "beagle", "base1", "base2", "factory"]);
+	Textures.shadow(["base1", "base2", "factory"]);
 	var loader = new THREE.TextureLoader();
 
 	loader.load('images/aridonis.jpg', function (texture) {
@@ -28,10 +47,12 @@ setTimeout(function () {
 		Textures.update("beagle", texture);
 	});
 	loader.load('images/base1.jpg', function (texture) {
-		Textures.update("base1", texture);
+		Textures.bind("base1", texture);
 	});
 	loader.load('images/base2.jpg', function (texture) {
-		Textures.update("base2", texture);
+		Textures.bind("base2", texture);
 	});
-}, 1000);
-
+	loader.load('images/factory.jpg', function (texture) {
+		Textures.bind("factory", texture);
+	});
+})();

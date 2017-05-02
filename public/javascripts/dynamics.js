@@ -17,6 +17,17 @@ function deselectObject(event) {
 	event.preventDefault();
 }
 
+function handleClick(event) {
+	event.stopPropagation();
+	var hit = env.unproject(event.clientX, event.clientY);
+	var mesh = hit.object;
+	if (env.isFloor(mesh)) {
+		goTo(hit);
+	} else {
+		onEntityClick(hit);
+	}
+}
+
 /**
  * Have a Robot interact with an Entity or select the clicked Entity.
  */
@@ -26,7 +37,6 @@ function onEntityClick(hit) {
 	var entity = Entities.get(mesh);
 	var isMyRobot = Entities.myRobot(env.selectedObject);
 	var coordinates = hit.point;
-	// var coordinates = Util.project(event.clientX, event.clientY);
 
 	if (!isMyRobot) {
 		selectEntity(entity);

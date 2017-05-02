@@ -88,28 +88,22 @@ $("#hud-display").click(function (event) {
 
 $("#build-factory").click(function (event) {
 	event.stopPropagation();
-	//var factory = new Factory(My.TEAM, Util.normalize(event));
-	var size = [15, 8, 8];
-	//var point = env.project(event.pageX, event.pageY);
-	var factory = env.addFactory(size, [event.pageX, event.pageY, 0], 0xff0000);
+	var factory = new Factory(My.TEAM, env.project(event.clientX, event.clientY));
 	activatePlacementMode(factory);
 });
 
 $("#build-base").click(function (event) {
 	event.stopPropagation();
-	var base = new CivBase(My.TEAM, Util.normalize(event));
+	var base = new CivBase(My.TEAM, env.project(event.clientX, event.clientY));
 	activatePlacementMode(base);
 });
 
 $("#build-turret").click(function (event) {
 	event.stopPropagation();
-	var turret = new Turret(My.TEAM, Util.normalize(event));
+	var turret = new Turret(My.TEAM, env.project(event.clientX, event.clientY));
 	activatePlacementMode(turret);
 });
 
-$("#build-greenhouse").click(function () {
-	alert("This doesn't do anything... yet.");
-});
 $("#build-robot").click(function (event) {
 	event.stopPropagation();
 	resources.pay(Robot.cost);
@@ -119,21 +113,22 @@ $("#build-robot").click(function (event) {
 
 function activatePlacementMode(building) {
 	Menu.switchShadow(building);
-	//building.view.off("click");
 
 	// change mouse behavior so building shadow follows cursor
-	$(document).off("click");
-	$(document).mousemove(function (event) {
-		//building.view.css(Util.normalize(event));
-
+	env.disable("click");
+	env.listen("mousemove", function (event) {
+		var position = env.project(event.clientX, event.clientY);
+		building.view.position.x = position.x;
+		building.view.position.z = position.z;
 	});
 
 
-	$(document).click(function () {
+	env.listen("click", function () {
 		// revert mouse behavior to deactivate placement mode
-		$(document).off("click");
-		$(document).on("click", goTo);
-		$(document).off("mousemove");
+		env.disable("click");
+		env.disable("mousemove");
+		env.listen("click", handleClick);
+
 		resources.buy(building);
 		Menu.buildingShadow = null;
 		goAndBuild(building);
@@ -143,13 +138,13 @@ function activatePlacementMode(building) {
 function goAndBuild(building) {
 
 	Entities.push(building);
-	building.view.click(onEntityClick);
+	// building.view.click(onEntityClick);
 	building.start();
 
 	if (!Entities.myRobot(env.selectedObject)) {
 		return;
 	}
 	var robot = env.selectedObject;
-	var target = Util.project(event.clientX, event.clientY);
+	var target = env.project(event.clientX, event.clientY);
 	robot.build(building, target);
 }

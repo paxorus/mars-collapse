@@ -16,7 +16,6 @@
 			<div class = "submenu" id = "default-submenu">
 				<div class = "option" id = "build-factory" title = "Create factory"></div>
 				<div class = "option" id = "build-base" title = "Create base"></div>
-				<div class = "option" id = "build-greenhouse" title = "Create greenhouse"></div>
 				<div class = "option" id = "build-turret" title = "Create turret"></div>
 			</div>
 			<div class = "submenu" id = "factory-submenu">
@@ -70,16 +69,7 @@
 		My.TEAM = "civ2";
 		startCivs(My.TEAM);
 
-		env.listen("click", function (event) {
-			event.stopPropagation();
-			var hit = env.unproject(event.clientX, event.clientY);
-			var mesh = hit.object;
-			if (env.isFloor(mesh)) {
-				goTo(hit);
-			} else {
-				onEntityClick(hit);
-			}
-		});
+		env.listen("click", handleClick);
 
 		env.listen("contextmenu", deselectObject);
 

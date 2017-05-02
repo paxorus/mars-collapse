@@ -41,46 +41,40 @@ function Environment() {
 		var sphereGeo = new THREE.SphereGeometry(3, 20, 20);
 		var sphereMat = (team == "civ1") ? Textures.eskie : Textures.beagle;
 		var sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-		sphereMesh.position.y = 4;
 		scene.add(sphereMesh);
 
-		sphereMesh.position.x = position.left;
-		sphereMesh.position.z = position.top;
+		sphereMesh.position.x = position.x;
+		sphereMesh.position.y = 4;
+		sphereMesh.position.z = position.z;
 		return sphereMesh;
 	}
 
 	this.addBase = function(position, team) {
 		var geometry = new THREE.BoxGeometry( 20, 10, 10 );
 		var material = (team == "civ1") ? Textures.base1 : Textures.base2;
-
 		var cube = new THREE.Mesh(geometry, material);
+		cube.position.set(position.x, 10, position.z);
 		scene.add(cube);
 
-		cube.position.x = position.left;
-		cube.position.z = position.top;
 		return cube;
 	}
 
-	this.addFactory = function (size, position, color) {
-		// color = color || 0x444444;
-		var geo = new THREE.BoxGeometry( size[0], size[1], size[2] );
-		var material = new THREE.MeshBasicMaterial( {color: color} );
-		var factory = new THREE.Mesh( geo, material );
-		
-
-		factory.position.set(position[0], position[1], position[2]);
+	this.addFactory = function (position) {
+		var geo = new THREE.BoxGeometry(20, 10, 10);
+		var factory = new THREE.Mesh(geo, Textures.factory);
+		factory.position.set(position.x, 10, position.z);
 		scene.add(factory);
 		return factory;
 	};
 
-	this.unproject = function (x, y) {
-		var raycaster = new THREE.Raycaster();// create once
-		var mouse = new THREE.Vector2();// create once
-	
+	var raycaster = new THREE.Raycaster();// create once
+	var mouse = new THREE.Vector2();// create once
+
+	this.unproject = function (x, y) {	
 		mouse.x = ( x / renderer.domElement.clientWidth ) * 2 - 1;
 		mouse.y = - ( y / renderer.domElement.clientHeight ) * 2 + 1;
 
-		raycaster.setFromCamera( mouse, camera );
+		raycaster.setFromCamera(mouse, camera);
 
 		var intersects = raycaster.intersectObjects(scene.children);
 		if (intersects.length == 0) {
@@ -90,12 +84,18 @@ function Environment() {
 		// return Entities.get(intersects[0]);
 	};
 
-	this.isFloor = function (mesh) {
-		return mesh == floor;
+	// 2D to 3D point on plane
+	this.project = function (x, y) {
+		mouse.x = ( x / renderer.domElement.clientWidth ) * 2 - 1;
+		mouse.y = - ( y / renderer.domElement.clientHeight ) * 2 + 1;
+
+		raycaster.setFromCamera(mouse, camera);
+
+		return raycaster.intersectObject(floor)[0].point;
 	};
 
-	this.highlight = function () {
-
+	this.isFloor = function (mesh) {
+		return mesh == floor;
 	};
 
 	// start an event listener
@@ -104,10 +104,12 @@ function Environment() {
 		renderer.domElement.addEventListener(eventType, eventHandler);
 	};
 
-	// kill all event listeners
-	this.disable = function () {
+	// kill all event listeners of some type
+	this.disable = function (eventType) {
 		listeners.forEach(function (data) {
-			renderer.domElement.removeEventListener(data[0], data[1]);
+			if (data[0] == eventType) {
+				renderer.domElement.removeEventListener(data[0], data[1]);
+			}
 		});
 	};
 

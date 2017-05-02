@@ -11,19 +11,7 @@ body{
     background-size: cover;
 }
 
-/*.factory, .base, .robot {
-	position: absolute;
-	cursor: pointer;
-}
-
-.factory {
-	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
-	width: 100px;
-	height: 100px;
-	background-size: 400px 210px;
-	background-position: -100px -50px;
-}
-
+/*
 .turret {
 	width:60px;
 	height:60px;
@@ -39,7 +27,6 @@ body{
 	top: 10px;
 	left: 27px;
 	background: white;
-
 }
 
 .turret-cannon-ball {
@@ -60,47 +47,12 @@ body{
 	position: absolute;
 }
 
-.base {
-	width: 150px;
-	height: 100px;
-}
-
-.civ1-base {
-	background-image: url('../images/base1.jpg');
-	background-size: cover;
-}
-
-.civ2-base {
-	background-image: url('../images/base2.jpg');
-	background-size: 160px 100px;
-	background-position-x: -10px;
-}
-
-.robot {
-	width: 40px;
-	height: 40px;
-	border-radius: 20px;
-	z-index: 3;
-}
-
 .missile {
 	width: 10px;
 	height: 10px;
 	border-radius: 5px;
 	background-color: red;
 	position: absolute;
-}
-
-.civ1-robot {
-	background-image: url('../images/eskie.jpg');
-	background-size: 40px 60px;
-	background-position: 0 -10px;
-}
-
-.civ2-robot {
-	background-image: url('../images/beagle.jpg');
-	background-size: 80px 53px;
-	background-position: -18px -7px;
 }
 
 .health-bar {
@@ -180,13 +132,10 @@ body{
 	display: none;
 }
 #build-factory {
-	background-image: url('https://s-media-cache-ak0.pinimg.com/originals/08/22/af/0822afa8ccc7aee3067b6fe8e909c2bc.jpg');
+	background-image: url('../images/factory.jpg');
 }
 #build-base {
 	background-image: url('../images/base1.jpg');
-}
-#build-greenhouse {
-	background-image: url('https://3c1703fe8d.site.internapcdn.net/newman/gfx/news/hires/2014/uadocumentar.jpg');
 }
 #build-robot {
 	background-image: url('../images/eskie.jpg');

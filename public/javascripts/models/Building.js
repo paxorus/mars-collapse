@@ -7,21 +7,22 @@ class Building extends Attackable {
 	constructor(team, position, initialHealth) {
 		super(team);
 		this.initialHealth = initialHealth || 100;
-
-		// this.view.css(position);
-		// this.view.css("filter", "brightness(50%)");
 		this.status = "incomplete";
 	}
 
-	start(soft) {
-		this.addHealthBar(this.initialHealth);
-		this.isAlive = false;// don't die in the next step
-		this.applyHealth(- this.initialHealth, true);// set health to 0
-		this.isAlive = true;
+	shadow() {
+		this.view.material = this.view.material.shadow;
+	}
 
-		if (!soft) {
-			socket.emit('start construction', serializeStatus(this._id));
-		}
+	start(soft) {
+		// this.addHealthBar(this.initialHealth);
+		// this.isAlive = false;// don't die in the next step
+		// this.applyHealth(- this.initialHealth, true);// set health to 0
+		// this.isAlive = true;
+
+		// if (!soft) {
+		// 	socket.emit('start construction', serializeStatus(this._id));
+		// }
 	}
 
 	build(deltaProgress, soft) {
@@ -39,7 +40,7 @@ class Building extends Attackable {
 	}
 
 	finish() {
-		this.view.css("filter", "none");
+		this.view.material = this.view.material.shadow;
 		if (this == env.selectedObject) {
 			$("#other").text("complete");
 		}

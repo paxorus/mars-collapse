@@ -9,6 +9,7 @@ class CivBase extends Building {
 		super(team, position, 200);
 		this.type = "CivBase";
 		this.view = env.addBase(position, team);
+		this.shadow();
 	}
 
 	static get cost() {
@@ -19,7 +20,7 @@ class CivBase extends Building {
 		// for the initial team bases
 		//this.addHealthBar(this.initialHealth);
 		// this.view.click(onEntityClick);
-		//this.view.css("filter", "none");
+		this.view.material = this.view.material.shadow;
 		this.status = "initial";
 	}
 
