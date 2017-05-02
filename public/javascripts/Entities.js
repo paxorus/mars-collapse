@@ -61,13 +61,19 @@ class EntitiesPrototype extends Array {
 		return x instanceof Robot && x.team == My.TEAM;
 	}
 
-	distance(player, entity) {
-		var robotRadius = player.view.geometry.boundingSphere.radius;
-		var playerX = (player.view.position.x + robotRadius);
-		var playerZ = (player.view.position.z + robotRadius);
-		var entityX = (entity.view.position.x + 0 / 2);
-		var entityZ = (entity.view.position.z + 0 / 2);// entity.view.height() 
-		return Util.distance(entityX - playerX, entityZ - playerZ);
+	distance(entity1, entity2) {
+		
+		var ent1X = entity1.view.position['x'];
+		var ent1Z = entity1.view.position['z'];
+		var ent2X = entity2.view.position['x'];
+		var ent2Z = entity2.view.position['z'];
+		var playerX 
+		// //var robotRadius = player.view.geometry.boundingSphere.radius;
+		// var playerX = (player.view.position.x + robotRadius);
+		// var playerZ = (player.view.position.z + robotRadius);
+		// var entityX = (entity.view.position.x + 0 / 2);
+		// var entityZ = (entity.view.position.z + 0 / 2);// entity.view.height() 
+		return Util.distance(ent1X - ent2X, ent1Z - ent2Z);
 	}
 };
 var Entities = new EntitiesPrototype();

@@ -64,13 +64,54 @@ function Environment() {
 		var factory = new THREE.Mesh(geo, Textures.factory);
 		factory.position.set(position.x, 10, position.z);
 		scene.add(factory);
+
+		//factory.position.set(position[0], position[1], position[2]);
+		factory.position.x = position[0];
+		factory.position.z = position[1];
+		
 		return factory;
 	};
+
+	this.addTurretCannon = function () {
+		var geometry2 = new THREE.BoxGeometry(8,1,1);
+		var material2 = new THREE.MeshBasicMaterial( {color: 0xffffff });
+		var turretCannon = new THREE.Mesh(geometry2, material2);
+		turretCannon.position.y = 5;
+
+		return turretCannon;
+	};
+
+	this.addTurret = function (position, color){
+		var geometry1 = new THREE.BoxGeometry(14, 7, 7);
+		var material1 = new THREE.MeshBasicMaterial( {color: color} );
+		var turret = new THREE.Mesh(geometry1, material1);
+		scene.add(turret);
+		// TODO: place properly
+		turret.position.x = 0;
+		turret.position.z = 0;
+		return turret;
+	};
+
+	this.removeObject = function(object){
+		scene.remove(object);
+	};
+
+	this.addMissile = function (position) {
+		var geometry = new THREE.SphereGeometry(1.5, 20, 20);
+		var material = new THREE.MeshBasicMaterial({color: 0x000000});
+		var missile = new THREE.Mesh(geometry,material);
+		scene.add(missile);
+
+		missile.position.x = position.x;
+		missile.position.z = position.z;
+		return missile
+	};
+
 
 	var raycaster = new THREE.Raycaster();// create once
 	var mouse = new THREE.Vector2();// create once
 
-	this.unproject = function (x, y) {	
+	this.unproject = function (x, y) {
 		mouse.x = ( x / renderer.domElement.clientWidth ) * 2 - 1;
 		mouse.y = - ( y / renderer.domElement.clientHeight ) * 2 + 1;
 
@@ -81,7 +122,6 @@ function Environment() {
 			return null;
 		}
 		return intersects[0];
-		// return Entities.get(intersects[0]);
 	};
 
 	// 2D to 3D point on plane
@@ -117,6 +157,6 @@ function Environment() {
 		renderer.render(scene, camera);
 		// camera.rotation.y = Date.now() * 0.00005;
 		requestAnimationFrame(animate);
-	}
+	};
 }
 
