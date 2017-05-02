@@ -13,15 +13,19 @@ var Profile = {
 	},
 
 	display: function (entity) {
-		var backImage = entity.view.material.map.image;
+		var mesh = entity.view;
+		if (entity instanceof Mine) {
+			mesh = mesh.children[0];
+		}
+		var backImage = mesh.material.map.image;
 		if (backImage) {
 			var url = "url(" + backImage.src + ")";
 			$("#thumbnail").css("background-image", url);
 		}
 
-		// $("#hud-bar").width(100 * entity.health / entity.initialHealth);
-		// $("#hud-bar").css("background-color", entity.healthBar.css("background-color"));
-		// $("#health-status").text(entity.health + "/" + entity.initialHealth);
+		$("#hud-bar").width(100 * entity.health / entity.initialHealth);
+		$("#hud-bar").css("background-color", Util.rgbString(entity.healthBar.material.color));
+		$("#health-status").text(entity.health + "/" + entity.initialHealth);
 		$("#type").text(entity.team + " " + entity.type);
 		$("#other").text("");
 		Menu.display(entity);
@@ -138,7 +142,6 @@ function activatePlacementMode(building) {
 function goAndBuild(building) {
 
 	Entities.push(building);
-	// building.view.click(onEntityClick);
 	building.start();
 
 	if (!Entities.myRobot(env.selectedObject)) {

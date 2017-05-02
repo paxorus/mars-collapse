@@ -16,6 +16,7 @@ class EntitiesPrototype extends Array {
 		// while (!jqueryObject.parent().is("body")) {
 		// 	jqueryObject = jqueryObject.parent();
 		// }
+		// console.log(mesh);
 		for (var i = 0; i < this.length; i ++) {
 			if (mesh == this[i].view) {
 				return this[i];

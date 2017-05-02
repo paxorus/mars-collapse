@@ -10,7 +10,7 @@
  */
 function deselectObject(event) {
 	if (env.selectedObject) {
-		env.selectedObject.view.material.opacity = 1;
+		env.selectedObject.markDeselected();
 		env.selectedObject = null;
 		Profile.clear();
 	}
@@ -21,22 +21,25 @@ function handleClick(event) {
 	event.stopPropagation();
 	var hit = env.unproject(event.clientX, event.clientY);
 	var mesh = hit.object;
+
+	while (!(mesh.parent instanceof THREE.Scene)) {
+		mesh = mesh.parent;
+	}
+	
 	if (env.isFloor(mesh)) {
 		goTo(hit);
 	} else {
-		onEntityClick(hit);
+		onEntityClick(hit.point, mesh);
 	}
 }
 
 /**
  * Have a Robot interact with an Entity or select the clicked Entity.
  */
-function onEntityClick(hit) {
+function onEntityClick(coordinates, mesh) {
 
-	var mesh = hit.object;
 	var entity = Entities.get(mesh);
 	var isMyRobot = Entities.myRobot(env.selectedObject);
-	var coordinates = hit.point;
 
 	if (!isMyRobot) {
 		selectEntity(entity);
@@ -59,13 +62,10 @@ function onEntityClick(hit) {
 
 function selectEntity(entity) {
 	if (env.selectedObject) {
-		env.selectedObject.view.material.opacity = 1;
+		env.selectedObject.markDeselected();
 	}
 
-	var material = entity.view.material.clone();
-	material.transparent = true;
-	material.opacity = 0.75;
-	entity.view.material = material;
+	entity.markSelected();
 	entity.display();
 	env.selectedObject = entity;
 }

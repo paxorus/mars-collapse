@@ -34,7 +34,9 @@ class Factory extends Building {
  	_dequeue() {
  		var next = this._queue.shift();
  		if (next == "R") {
-	 		var robot = new Robot(this.team, this.view.position());
+ 			var robotPosition = this.view.position.clone();
+ 			robotPosition.z += 5;
+	 		var robot = new Robot(this.team, robotPosition);
  			Entities.push(robot);
  		}
  		if (this._queue.length > 0) {

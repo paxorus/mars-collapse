@@ -15,14 +15,14 @@ class Building extends Attackable {
 	}
 
 	start(soft) {
-		// this.addHealthBar(this.initialHealth);
-		// this.isAlive = false;// don't die in the next step
-		// this.applyHealth(- this.initialHealth, true);// set health to 0
-		// this.isAlive = true;
+		this.addHealthBar(this.initialHealth);
+		this.isAlive = false;// don't die in the next step
+		this.applyHealth(- this.initialHealth, true);// set health to 0
+		this.isAlive = true;
 
-		// if (!soft) {
-		// 	socket.emit('start construction', serializeStatus(this._id));
-		// }
+		if (!soft) {
+			socket.emit('start construction', serializeStatus(this._id));
+		}
 	}
 
 	build(deltaProgress, soft) {

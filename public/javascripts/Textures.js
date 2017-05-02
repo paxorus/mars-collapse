@@ -32,9 +32,14 @@ var Textures = {
 	}
 };
 
+
 (function () {
-	Textures.default(["floor", "eskie", "beagle", "base1", "base2", "factory", "mine"]);
-	Textures.shadow(["base1", "base2", "factory"]);
+	Textures.default(["floor", "eskie", "beagle", "base1", "base2", "factory", "mine", "turret"]);
+	Textures.shadow(["base1", "base2", "factory", "turret"]);
+
+	Textures.turret.color.setHex(0x009999);
+	Textures.turretShadow.color.setHex(0x002e14);
+
 	var loader = new THREE.TextureLoader();
 
 	loader.load('images/aridonis.jpg', function (texture) {

@@ -15,9 +15,6 @@ class Entity {
 		this.type = "Unassigned";
 		this.isAlive = true;
 		this._id = Util.generateUuid();
-		// this.view = $("<div>");
-		// this.view.click(onEntityClick);
-		// $(document.body).append(this.view);
 	}
 
 	isDead() {
@@ -38,14 +35,22 @@ class Entity {
 		Profile.display(this);
 	}
 
+	markSelected() {
+		var material = this.view.material.clone();
+		material.transparent = true;
+		material.opacity = 0.75;
+		this.view.material = material;
+	}
+
+	markDeselected() {
+		this.view.material.opacity = 1;
+	}
+
 	addHealthBar(health) {
-		// call this method after adding a class to the view, as this method relies on the final width
-		// of the <div> view
 		this.initialHealth = health;
 		this.health = health;
-		this.healthBar = $("<div>", {class: "health-bar"});
-		this.healthBar.css({marginLeft: (this.view.width() - health) / 2 + "px", width: health});
-		this.view.append(this.healthBar);
+		this.healthBar = env.addHealthBar(health);
+		this.view.add(this.healthBar);
 	}
 
 	applyHealth(deltaHealth, soft) {
@@ -57,6 +62,7 @@ class Entity {
 		if (this.health === 0 && this.isAlive) {
 			this.isAlive = false;
 			this.die();
+			return;
 		}
 
 		this.updateHealthBar();
@@ -64,11 +70,11 @@ class Entity {
 
 	updateHealthBar() {
 		// change size
-		this.healthBar.width(this.health);
+		this.healthBar.scale.x = (this.health / this.initialHealth) || 1e-6;
 		// change color
 		var color = Util.rybCurve(this.health / this.initialHealth);
-		this.healthBar.css("background-color", color);
-		Profile.update(this, color);		
+		this.healthBar.material.color = color;
+		Profile.update(this, Util.rgbString(color));
 	}
 }
 

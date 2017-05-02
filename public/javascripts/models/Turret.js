@@ -7,11 +7,11 @@ class Turret extends Building {
 	constructor(team, position) {
 		super(team, position, 5);
 		this.type = "Turret";
-		team = "civ2";
-		var color = (team == 'civ1') ? 0x00ff00 : 0x009999;// green or blue
-		this.view = env.addTurret(position, color);
+		this.view = env.addTurret(position);
 		this.cannon = env.addTurretCannon();
 		this.view.add(this.cannon);
+		this.shadow();
+
 		this.spinFrame = null;
 		this.angle = 0;
 		this.lastFire = 0;
@@ -62,14 +62,25 @@ class Turret extends Building {
 	}
 
 	_shoot(missile){
+		if (this._target === null) {// fly straight
+			this._shift(missile, missile.velocity[0], missile.velocity[1]);
+			if (env.inBounds(missile)) {
+				this.shootFrame = requestAnimationFrame(this._shoot.bind(this, missile));
+			} else {
+				env.remove(missile);
+			}
+			return;
+		}
+
+		// home in on the target
 		var target = this._target.view.position;
 		var position = missile.position;
 		var distanceX = target.x - position.x;
 		var distanceY = target.z - position.z;
 		var distance = Util.distance(distanceX,distanceY);
 		if(distance < this.MISSILE_SPEED){
-			env.removeObject(missile);
-			// this._target.applyHealth(-5);
+			env.remove(missile);
+			this._target.applyHealth(-5);
 			return;
 		}
 
@@ -118,5 +129,6 @@ class Turret extends Building {
 	_shift(missile, deltaX, deltaZ){
 		missile.position.x += deltaX;
 		missile.position.z += deltaZ;
+		missile.velocity = [deltaX, deltaZ];// save as inherent property
 	}
 }

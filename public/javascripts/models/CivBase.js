@@ -18,8 +18,7 @@ class CivBase extends Building {
 
 	quickstart() {
 		// for the initial team bases
-		//this.addHealthBar(this.initialHealth);
-		// this.view.click(onEntityClick);
+		this.addHealthBar(this.initialHealth);
 		this.view.material = this.view.material.shadow;
 		this.status = "initial";
 	}

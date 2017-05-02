@@ -21,12 +21,8 @@ function Environment() {
 	var floor = addFloor();
 	animate();
 
-	this.getRenderer = function (){
-		return renderer;
-	};
-
-	this.getCamera = function (){
-		return camera;
+	this.getScene = function () {
+		return scene;
 	};
 
 	function addFloor() {
@@ -62,13 +58,17 @@ function Environment() {
 		var geo = new THREE.SphereGeometry(3, 32, 32, 0, Math.PI);
 		var mesh = new THREE.Mesh(geo, Textures.mine);
 		mesh.material.color = {r: 0.96, g: 0.58, b: 0.26};// strong orange
-		mesh.position.set(position.x, -1, position.z);
 		mesh.rotation.x = -Math.PI / 2;
 		num /= 30;
 		mesh.scale.set(num, num, num);
-		scene.add(mesh);
 
-		return mesh;
+		var mine = new THREE.Mesh();
+		mine.add(mesh);
+		mine.position.set(position.x, -1, position.z);
+
+		scene.add(mine);
+
+		return mine;
 	};
 
 	this.addFactory = function (position) {
@@ -76,36 +76,26 @@ function Environment() {
 		var factory = new THREE.Mesh(geo, Textures.factory);
 		factory.position.set(position.x, 10, position.z);
 		scene.add(factory);
-
-		//factory.position.set(position[0], position[1], position[2]);
-		factory.position.x = position[0];
-		factory.position.z = position[1];
 		
 		return factory;
 	};
 
 	this.addTurretCannon = function () {
 		var geometry2 = new THREE.BoxGeometry(8,1,1);
-		var material2 = new THREE.MeshBasicMaterial( {color: 0xffffff });
+		var material2 = new THREE.MeshBasicMaterial( {color: 0xffffff});
 		var turretCannon = new THREE.Mesh(geometry2, material2);
 		turretCannon.position.y = 5;
 
 		return turretCannon;
 	};
 
-	this.addTurret = function (position, color){
-		var geometry1 = new THREE.BoxGeometry(14, 7, 7);
-		var material1 = new THREE.MeshBasicMaterial( {color: color} );
-		var turret = new THREE.Mesh(geometry1, material1);
+	this.addTurret = function (position) {
+		var geo = new THREE.BoxGeometry(14, 7, 7);
+		var turret = new THREE.Mesh(geo, Textures.turret);
 		scene.add(turret);
-		// TODO: place properly
-		turret.position.x = 0;
-		turret.position.z = 0;
-		return turret;
-	};
 
-	this.removeObject = function(object){
-		scene.remove(object);
+		turret.position.set(position.x, 3.5, position.z);
+		return turret;
 	};
 
 	this.addMissile = function (position) {
@@ -116,20 +106,30 @@ function Environment() {
 
 		missile.position.x = position.x;
 		missile.position.z = position.z;
-		return missile
+		return missile;
+	};
+
+	this.addHealthBar = function (num) {
+		var geo = new THREE.PlaneGeometry(num / 5, 2);
+		var mat = new THREE.MeshBasicMaterial({color: 0x0088ff});
+		var mesh = new THREE.Mesh(geo, mat);
+		mesh.position.y = 5;
+
+		return mesh;
 	};
 
 
 	var raycaster = new THREE.Raycaster();// create once
 	var mouse = new THREE.Vector2();// create once
 
+	// 2D point to mesh
 	this.unproject = function (x, y) {
 		mouse.x = ( x / renderer.domElement.clientWidth ) * 2 - 1;
 		mouse.y = - ( y / renderer.domElement.clientHeight ) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
 
-		var intersects = raycaster.intersectObjects(scene.children);
+		var intersects = raycaster.intersectObjects(getMeshes());
 		if (intersects.length == 0) {
 			return null;
 		}
@@ -168,6 +168,20 @@ function Environment() {
 			}
 		});
 	};
+
+	this.inBounds = function (mesh) {
+		return Math.abs(mesh.position.x) < 300 && Math.abs(mesh.position.z) < 300;
+	}
+
+	function getMeshes() {
+		var meshes = [];
+		scene.traverse(function (mesh) {
+			if (mesh instanceof THREE.Mesh) {
+				meshes.push(mesh);
+			}
+		});
+		return meshes;
+	}
 
 	function animate() {
 		renderer.render(scene, camera);

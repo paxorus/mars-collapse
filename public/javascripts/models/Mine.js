@@ -7,24 +7,36 @@ class Mine extends Entity {
 		super();
 		this.team = "";
 		this.type = "Mine";
-		// this.addHealthBar(num);
 		this.view = env.addMine(position, num);
-		// this.healthBar.css("display", "none");
+		this.addHealthBar(num);
+		this.healthBar.material.transparent = true;
+		this.healthBar.material.opacity = 0;
 	}
 
 	mining(deltaProgress, soft) {
 		if (!soft) {
+			deltaProgress = Math.min(deltaProgress, this.health);
 			resources.metal += deltaProgress;
 			resources.update();
 			socket.emit('mine', serializeMine(this._id, deltaProgress));
 		}
 
-		deltaProgress = Math.min(deltaProgress, this.health);
 		super.applyHealth(-deltaProgress, true);
-		// this.healthBar.css("display", "block");
+		this.healthBar.material.opacity = 1;
 	}
 
 	hasMinerals() {
 		return this.isAlive;
+	}
+
+	markSelected() {
+		var material = this.view.children[0].material.clone();
+		material.transparent = true;
+		material.opacity = 0.75;
+		this.view.children[0].material = material;
+	}
+
+	markDeselected() {
+		this.view.children[0].material.opacity = 1;
 	}
 }

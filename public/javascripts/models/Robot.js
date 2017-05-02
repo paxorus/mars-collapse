@@ -15,9 +15,9 @@ class Robot extends Attackable {
 		this._timeout = null;
 		this._animation = null;
 
-	 	// this.addHealthBar(50);
 	 	this.view = env.addRobot(position, team);
-	 	
+	 	this.addHealthBar(50);
+
 	 	if (team == My.TEAM) {
 		 	resources.robot ++;
 		 	resources.update();
@@ -133,7 +133,6 @@ class Robot extends Attackable {
 		}
 
 		this.view.position.x += deltaX;
-		// console.log(deltaZ);
 		this.view.position.z += deltaZ;
 	}
 

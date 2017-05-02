@@ -9,21 +9,28 @@ var Util = {
 		// Euclidean distance
 		return Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
 	},
+
 	pick: function (a, b) {
 		// gives integer in [a,b)
 		return Math.floor(a + Math.random() * (b - a));
 	},
+
 	rybCurve: function (x) {
 		if (x === 1) {
-			return "#0088FF";// 100% health -> neon blue
+			return {r: 0, g: 0.533, b: 1};// 100% health -> neon blue
 		}
 		// continuous map from x in [0,1] to an RGB triplet, red to yellow to green
-		var red = Math.min(2 - 2 * x, 1);
-		var green = Math.min(2 * x, 1);
-		var blue = 0;
-
-		return "rgb(" + this.pix(red) +  "," + this.pix(green) + ", " + this.pix(blue) + ")";
+		return {
+			r: Math.min(2 - 2 * x, 1),
+			g: Math.min(2 * x, 1),
+			b: 0
+		}
 	},
+
+	rgbString: function (obj) {
+		return "rgb(" + this.pix(obj.r) +  "," + this.pix(obj.g) + ", " + this.pix(obj.b) + ")";
+	},
+
 	pix: function (x) {
 		return Math.floor(255 * x);
 	},
